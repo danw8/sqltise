@@ -14,6 +14,8 @@ export default {
 	methods: {
 		fileSelected : function (e) {
 			var files = e.target.files;
+			// eslint-disable-next-line
+			console.log(files);
 			if (files.length > 1) {
 				// validation should fail
 				alert("Too many files");
@@ -29,11 +31,23 @@ export default {
 			}
 
 			var file = files[0];
-			if (file.type !== 'text/csv'){
-				// validation should fail
-				alert("Not a csv file");
-				this.$refs.fileform.reset();
-				return;
+			// eslint-disable-next-line
+			console.log(file.type);
+			if (file.type !== 'text/csv') {
+				if (file.type !== 'application/vnd.ms-excel') {
+					// validation should fail
+					alert("Not a csv file");
+					this.$refs.fileform.reset();
+					return;
+				}
+
+				if (!file.name.endsWith(".csv")) {
+					// validation should fail
+					alert("Not a csv file");
+					this.$refs.fileform.reset();
+					return;
+				}
+				
 			}
 
 			this.$refs.filelabel.textContent = file.name;
@@ -63,6 +77,7 @@ export default {
 
 .file-upload {
 	position: relative;
+	margin: 10px 0px;
 }
 
 .csv-upload-label {
