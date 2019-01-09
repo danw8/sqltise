@@ -7,8 +7,7 @@
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
-//const rust = import('./rust/csv2sql')
-var rust = import('./rust/csv2sql')
+var csv2sql = import('./csv2sql/csv2sql')
 
 export default {
   name: 'app',
@@ -16,10 +15,8 @@ export default {
     HelloWorld
   },
   methods: {
-    bacon: (f) => { 
-      // eslint-disable-next-line
-      console.log(rust);  
-      rust._v.greet(f);
+    bacon: (f) => {
+      csv2sql._v.greet(f);
     }
   }
 }
