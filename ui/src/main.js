@@ -8,7 +8,7 @@ var csv2sql = import('./csv2sql/csv2sql');
 
 var default_state = function() {
 	return {
-		columns: [],
+		columns: [{name:"StateCode",index:0}],
 		column_selections: {
 			value: [],
 			done: false,
@@ -21,6 +21,23 @@ var default_state = function() {
 			value: []
 		},
 		debug: true,
+		error_solutions: [],
+		errors: [
+			{
+				statement_id: 1,
+				column_id: 1,
+				type:'VARCHAR',
+				error_text:'some failed text',
+				rows:[1,2,3,4]
+			},
+			{
+				statement_id: 2,
+				column_id: 2,
+				type:'VARCHAR',
+				error_text:'some other failed text',
+				rows:[1,2]
+			}
+		],
 	}
 };
 
@@ -30,12 +47,18 @@ var store = new Vuex.Store({
 	state: Object.assign({}, default_state()),
 	mutations: {
 	LOAD_CSV: (state, data) => {
-	var result = csv2sql._v.get_columns(data);
-		if (result) {
-			state.columns = result.columns;
-			state.raw_csv = data;
-			state.loaded = true;
-		}
+		csv2sql
+			.then(m => {
+				var result = m.get_columns(data);
+				if (result) {
+					state.columns = result.columns;
+					state.raw_csv = data;
+					state.loaded = true;
+					//state.errors = result.errors;
+				}
+			})
+			.catch(console.error);
+		
 	},
 	RESET: (state) => {
 		//state_stack.push(state);
@@ -61,6 +84,25 @@ var store = new Vuex.Store({
 	REMOVE_COLUMN: (state, index) => {
 		state.column_selections.value.splice(index, 1);
 	},
+	SOLVE_ERROR: (state, index) => {
+		
+		state.error_solutions.push(state.errors[index]);
+		state.errors.splice(index, 1);
+		console.log(state.error_solutions);
+	},
+	GENERATE_SQL: (state) =>
+	{
+		csv2sql
+			.then(m => {
+				console.log("this should call the generate sql endpoint in rust")
+				// let result = m.get_sql(state)
+				// if (result === "SUCCESS")
+				// {
+				// 	state.errors.splice(index, 1)
+				// }
+			})
+			.catch(console.error)
+	}
 	}
 });
 

@@ -58,7 +58,9 @@ export default {
 			if (!columns || columns.length === 0){
 				return false;
 			}
-			return columns.every((s) => !!s.column && !!s.statement  && !!s.type && (!!s.name || s.use_source) );
+			return columns.every((s) => {
+					return s.column != undefined && s.statement_id != undefined  && !!s.type && (!!s.name || s.use_source) && !(!!s.name && s.use_source)
+				});
 		},
 		remove: function(index) {
 			this.REMOVE_COLUMN(index);
