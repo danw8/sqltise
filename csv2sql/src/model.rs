@@ -33,7 +33,7 @@ pub struct ColumnSelections {
 	pub value: Vec<ColumnSelection>
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct ColumnSelection {
 	pub column: usize,
 	pub statement_id: usize,

@@ -7,6 +7,8 @@ export function check_correction(arg0: string, arg1: string): any;
 
 export function process_file(arg0: string, arg1: any): any;
 
+export function generate_file(arg0: string, arg1: any, arg2: any, arg3: any): any;
+
 export function __wbgtest_console_log(arg0: any, arg1: any): void;
 
 export function __wbgtest_console_error(arg0: any, arg1: any): void;

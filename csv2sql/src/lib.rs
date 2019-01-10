@@ -7,6 +7,7 @@ use wasm_bindgen::prelude::*;
 
 mod model;
 pub mod process;
+pub mod generate;
 
 use self::model::{CsvHeaders, ColumnHeader};
 pub use self::process::process_file;

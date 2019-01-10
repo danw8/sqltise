@@ -139,6 +139,26 @@ export function process_file(arg0, arg1) {
 
 }
 
+/**
+* @param {string} arg0
+* @param {any} arg1
+* @param {any} arg2
+* @param {any} arg3
+* @returns {any}
+*/
+export function generate_file(arg0, arg1, arg2, arg3) {
+    const ptr0 = passStringToWasm(arg0);
+    const len0 = WASM_VECTOR_LEN;
+    try {
+        return takeObject(wasm.generate_file(ptr0, len0, addHeapObject(arg1), addHeapObject(arg2), addHeapObject(arg3)));
+
+    } finally {
+        wasm.__wbindgen_free(ptr0, len0 * 1);
+
+    }
+
+}
+
 export function __wbg_self_1ec1c3e6d75f31d7(arg0) {
     return addHeapObject(getObject(arg0).self);
 }
@@ -277,7 +297,7 @@ export function __wbg_forEach_7796ea23499aa552(arg0, arg1, arg2) {
         }
 
     };
-    cbarg1.f = wasm.__wbg_function_table.get(147);
+    cbarg1.f = wasm.__wbg_function_table.get(164);
     cbarg1.a = arg1;
     cbarg1.b = arg2;
     try {
@@ -347,7 +367,7 @@ export function __wbg_new_bdd94b8735e4f66d(arg0, arg1) {
         }
 
     };
-    cbarg0.f = wasm.__wbg_function_table.get(140);
+    cbarg0.f = wasm.__wbg_function_table.get(157);
     cbarg0.a = arg0;
     cbarg0.b = arg1;
     try {
@@ -478,9 +498,9 @@ export function __wbindgen_jsval_eq(a, b) {
     return getObject(a) === getObject(b) ? 1 : 0;
 }
 
-export function __wbindgen_closure_wrapper2760(a, b, _ignored) {
-    const f = wasm.__wbg_function_table.get(118);
-    const d = wasm.__wbg_function_table.get(119);
+export function __wbindgen_closure_wrapper3251(a, b, _ignored) {
+    const f = wasm.__wbg_function_table.get(135);
+    const d = wasm.__wbg_function_table.get(136);
     const cb = function(arg0) {
         this.cnt++;
         let a = this.a;
