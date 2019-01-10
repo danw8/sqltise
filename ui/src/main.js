@@ -8,13 +8,18 @@ var csv2sql = import('./csv2sql/csv2sql');
 
 var default_state = function() {
   return {
-    columns: {},
+    columns: [],
+    column_selections: {
+      value: [],
+      done: false,
+    },
     raw_csv: null,
     loaded: false,
     statements: {
       done: false,
       value: []
     },
+    debug: true,
   }
 };
 
@@ -44,7 +49,16 @@ var store = new Vuex.Store({
     },
     DONE_ADDING_STATEMENTS: (state) => {
       state.statements.done = true;
-    }
+    },
+    ADD_COLUMN: (state) => {
+      state.column_selections.value.push({column: null, statement: null, name: '', type: null, usesource: false });
+    },
+    DONE_ADDING_COLUMNS: (state) => {
+      state.column_selections.done = true;
+    },
+    REMOVE_COLUMN: (state, index) => {
+      state.column_selections.value.splice(index, 1);
+    },
 	}
 });
 

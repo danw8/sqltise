@@ -20,7 +20,7 @@
             <button class="remove-button" v-on:click="remove(index)"><i class="fa fa-trash"></i></button>
         </div>
         <button class="statements-button" v-on:click="add">Add Statement<i class="fa fa-plus add-icon"></i></button>
-        <button class="statements-button" v-on:click="done">Done<i class="fa fa-check add-icon"></i></button>
+        <button class="statements-button" v-on:click="done" v-if="statements_complete(statements.value)">Done<i class="fa fa-check add-icon"></i></button>
     </div>
 </template>
 
@@ -43,6 +43,12 @@ export default {
         },
         remove: function(index) {
             this.REMOVE_STATEMENT(index);
+        },
+        statements_complete: function(statements) {
+            if (!statements || statements.length === 0){
+                return false;
+            }
+            return statements.every((s) => !!s.name && !!s.table && !!s.type);
         }
         // other methods
     },
@@ -85,7 +91,8 @@ export default {
 .statement-header div{
     margin-right: 16px;
     text-align: center;
-    width: 200px;
+    min-width: 225px;
+    max-width: 225px;
     font-weight: 700;
 }
 
@@ -98,14 +105,16 @@ export default {
     margin-right: 16px;
     font-size: 16px;
     padding: 8px;
-    width: 200px;
+    min-width: 207px;
+    max-width: 207px;
 }
 
 .statement-select{
     margin-right: 16px;
     padding: 10px;
     font-size: 16px;
-    width: 200px;
+    min-width: 225px;
+    max-width: 225px;
 }
 
 .remove-button{
@@ -113,7 +122,13 @@ export default {
     border: none;
     color: #630A0C;
     font-size: 1.25em;
-    width: 200px;
+    min-width: 225px;
+    max-width: 225px;
     text-align: center;
+}
+
+.remove-button:hover {
+    color: #A8383B;
+    cursor: pointer;
 }
 </style>

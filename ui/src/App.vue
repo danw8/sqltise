@@ -6,10 +6,12 @@
 		<Reset v-if="loaded"/>
 		<LoadCsvFile v-if="!loaded"/>
 		<SelectStatements v-if="loaded && !statements.done"/>
-		<div>
+		<ColumnSelections v-if="statements.done && !column_selections.done"/>
+		<div v-if="debug">
 			<h3>Debug:</h3>
 			<div><pre>Columns: {{columns}}</pre></div>
 			<div><pre>Statements: {{statements}}</pre></div>
+			<div><pre>Column Selections: {{column_selections}}</pre></div>
 		</div>
 	</div>
 </template>
@@ -18,6 +20,7 @@
 import LoadCsvFile from './components/LoadCsvFile.vue';
 import Reset from './components/Reset.vue';
 import SelectStatements from './components/SelectStatements.vue';
+import ColumnSelections from './components/ColumnSelections.vue';
 import { mapState } from 'vuex'
 
 export default {
@@ -26,7 +29,9 @@ export default {
 		...mapState([
 			'columns',
 			'loaded',
-			'statements'
+			'statements',
+			'debug',
+			'column_selections',
 		]),
 		// other properties
 	},
@@ -34,6 +39,7 @@ export default {
 		LoadCsvFile,
 		Reset,
 		SelectStatements,
+		ColumnSelections,
 	},
 }
 </script>
