@@ -8,7 +8,7 @@ var csv2sql = import('./csv2sql/csv2sql');
 
 var default_state = function() {
 	return {
-		columns: [],
+		columns: [{name:"StateCode",index:0}],
 		column_selections: {
 			value: [],
 			done: false,
@@ -21,6 +21,14 @@ var default_state = function() {
 			value: []
 		},
 		debug: true,
+		errors: [
+			{statement_id: 1,
+			column_id: 1,
+			type:'VARCHAR',
+			error_text:'some failed text',
+			rows:[1,2,3,4]
+		}
+		],
 	}
 };
 
@@ -30,12 +38,17 @@ var store = new Vuex.Store({
 	state: Object.assign({}, default_state()),
 	mutations: {
 	LOAD_CSV: (state, data) => {
-	var result = csv2sql._v.get_columns(data);
-		if (result) {
-			state.columns = result.columns;
-			state.raw_csv = data;
-			state.loaded = true;
-		}
+		csv2sql
+			.then(m => {
+				var result = m.get_columns(data);
+				if (result) {
+					state.columns = result.columns;
+					state.raw_csv = data;
+					state.loaded = true;
+				}
+			})
+			.catch(console.error);
+		
 	},
 	RESET: (state) => {
 		//state_stack.push(state);
@@ -61,6 +74,19 @@ var store = new Vuex.Store({
 	REMOVE_COLUMN: (state, index) => {
 		state.column_selections.value.splice(index, 1);
 	},
+	SOLVE_ERROR: (state, index) => {
+		console.log('Hi ' + state.errors[index].error_text)
+		let result = 
+		csv2sql
+			.then(m => {
+				let result = m.solve_error(state.error[index])
+				if (result === "SUCCESS")
+				{
+					state.errors.splice(index, 1)
+				}
+			})
+			.catch(console.error)
+	}
 	}
 });
 
