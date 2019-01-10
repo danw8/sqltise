@@ -4,7 +4,7 @@
             <thead>
                 <tr>
                     <th>Invalid Data</th>
-                    <th>Column</th>
+                    <th>Type</th>
                     <th>Count</th>      
                     <th>Action</th>
                 </tr>
@@ -12,7 +12,7 @@
             <tbody>
                 <tr v-for="(error, index) in errors" :key="index">
                     <td><input type="text" v-model="error.error_text" /></td>
-                    <td>{{columns[error.column_id].name}}</td>
+                    <td>{{error.type}}</td>
                     <td>{{error.rows.length}}</td>
                     <td><button v-on:click="solve(index)">Resolve</button></td>
                 </tr>

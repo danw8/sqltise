@@ -21,13 +21,22 @@ var default_state = function() {
 			value: []
 		},
 		debug: true,
+		error_solutions: [],
 		errors: [
-			{statement_id: 1,
-			column_id: 1,
-			type:'VARCHAR',
-			error_text:'some failed text',
-			rows:[1,2,3,4]
-		}
+			{
+				statement_id: 1,
+				column_id: 1,
+				type:'VARCHAR',
+				error_text:'some failed text',
+				rows:[1,2,3,4]
+			},
+			{
+				statement_id: 2,
+				column_id: 2,
+				type:'VARCHAR',
+				error_text:'some other failed text',
+				rows:[1,2]
+			}
 		],
 	}
 };
@@ -45,6 +54,7 @@ var store = new Vuex.Store({
 					state.columns = result.columns;
 					state.raw_csv = data;
 					state.loaded = true;
+					//state.errors = result.errors;
 				}
 			})
 			.catch(console.error);
@@ -75,15 +85,21 @@ var store = new Vuex.Store({
 		state.column_selections.value.splice(index, 1);
 	},
 	SOLVE_ERROR: (state, index) => {
-		console.log('Hi ' + state.errors[index].error_text)
-		let result = 
+		
+		state.error_solutions.push(state.errors[index]);
+		state.errors.splice(index, 1);
+		console.log(state.error_solutions);
+	},
+	GENERATE_SQL: (state) =>
+	{
 		csv2sql
 			.then(m => {
-				let result = m.solve_error(state.error[index])
-				if (result === "SUCCESS")
-				{
-					state.errors.splice(index, 1)
-				}
+				console.log("this should call the generate sql endpoint in rust")
+				// let result = m.get_sql(state)
+				// if (result === "SUCCESS")
+				// {
+				// 	state.errors.splice(index, 1)
+				// }
 			})
 			.catch(console.error)
 	}
