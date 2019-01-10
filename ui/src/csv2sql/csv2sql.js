@@ -92,6 +92,27 @@ export function get_columns(arg0) {
 
 }
 
+/**
+* @param {string} arg0
+* @param {string} arg1
+* @returns {any}
+*/
+export function check_correction(arg0, arg1) {
+    const ptr0 = passStringToWasm(arg0);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passStringToWasm(arg1);
+    const len1 = WASM_VECTOR_LEN;
+    try {
+        return takeObject(wasm.check_correction(ptr0, len0, ptr1, len1));
+
+    } finally {
+        wasm.__wbindgen_free(ptr0, len0 * 1);
+        wasm.__wbindgen_free(ptr1, len1 * 1);
+
+    }
+
+}
+
 function addHeapObject(obj) {
     if (heap_next === heap.length) heap.push(heap.length + 1);
     const idx = heap_next;
@@ -457,7 +478,7 @@ export function __wbindgen_jsval_eq(a, b) {
     return getObject(a) === getObject(b) ? 1 : 0;
 }
 
-export function __wbindgen_closure_wrapper2751(a, b, _ignored) {
+export function __wbindgen_closure_wrapper2760(a, b, _ignored) {
     const f = wasm.__wbg_function_table.get(118);
     const d = wasm.__wbg_function_table.get(119);
     const cb = function(arg0) {

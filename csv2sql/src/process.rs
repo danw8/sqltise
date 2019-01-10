@@ -1,8 +1,20 @@
 use wasm_bindgen::prelude::*;
 use super::model::{ ColumnSelections, CsvError, CsvErrors, ColumnType, ParseError};
-use chrono::prelude::*;
 use chrono::{NaiveDate, NaiveDateTime};
 
+
+#[wasm_bindgen]
+pub fn check_correction(value: &str, column_type: &str) -> JsValue {
+    let error = match column_type {
+        "Int" => check_int_errors(value.trim()),
+        "Float" => check_float_errors(value.trim()),
+        "Date" => check_date_errors(value.trim()),
+        "DateTime" => check_datetime_errors(value.trim()),
+        "VarChar" => check_varchar_errors(value.trim()),
+        _ => false
+    };
+    return JsValue::from_bool(!error);
+}
 
 #[wasm_bindgen]
 pub fn process_file(data: &str, columns: JsValue) -> JsValue {
@@ -15,8 +27,6 @@ pub fn process_file(data: &str, columns: JsValue) -> JsValue {
         let statement_id = column.statement_id;
         let mut column_errors: Vec<CsvError> = Vec::new();
 
-        let mut looked_at = false;
-
         let mut reader = csv::ReaderBuilder::new()
 		    .has_headers(true)
 		    .from_reader(data.as_bytes());
@@ -27,8 +37,7 @@ pub fn process_file(data: &str, columns: JsValue) -> JsValue {
                 Err(e) => {
                     let error = &format!("{{ error: 'Not a proper csv file', kind: {} }}", e);
                     let json: ParseError = serde_json::from_str(error).unwrap();
-                    //return JsValue::from_serde(&json).unwrap();
-                    panic!("Error");
+                    return JsValue::from_serde(&json).unwrap();
                 }
             };
             let value = &record[id];

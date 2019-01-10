@@ -2,6 +2,7 @@
 export const memory: WebAssembly.Memory;
 export function greet(a: number, b: number): void;
 export function get_columns(a: number, b: number): number;
+export function check_correction(a: number, b: number, c: number, d: number): number;
 export function process_file(a: number, b: number, c: number): number;
 export function __wbg_context_free(a: number): void;
 export function context_new(): number;
