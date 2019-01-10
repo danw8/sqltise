@@ -17,18 +17,17 @@
 				<option v-for="(option, index) in columns" :key="index" :value="option.index">{{option.name}}</option>
 			</select>
 			<select v-model="column.type" class="column-select">
-				<option>int</option>
-				<option>decimal</option>
-				<option>float</option>
-				<option>date</option>
-				<option>datetime</option>
-				<option>varchar</option>
+				<option>Int</option>
+				<option>Float</option>
+				<option>Date</option>
+				<option>DateTime</option>
+				<option>VarChar</option>
 			</select>
 			<select v-model="column.statement_id" class="column-select">
 				<option v-for="(option, index) in statements.value" :key="index" :value="option.id">{{option.name}} - ({{option.table}})</option>
 			</select>
 			<div id="small-column" class="column-checkbox">
-				<input type="checkbox" id="checkbox" v-model="column.usesource"/>
+				<input type="checkbox" id="checkbox" v-model="column.use_source"/>
 			</div>
 			<input v-model="column.name" class="column-input"/>
 			<button id="small-column" class="remove-button" v-on:click="remove(index)"><i class="fa fa-trash"></i></button>
@@ -59,7 +58,7 @@ export default {
 			if (!columns || columns.length === 0){
 				return false;
 			}
-			return columns.every((s) => !!s.column && !!s.statement  && !!s.type && (!!s.name || s.usesource) );
+			return columns.every((s) => !!s.column && !!s.statement  && !!s.type && (!!s.name || s.use_source) );
 		},
 		remove: function(index) {
 			this.REMOVE_COLUMN(index);

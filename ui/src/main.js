@@ -53,7 +53,7 @@ var store = new Vuex.Store({
 		state.statements.done = true;
 	},
 	ADD_COLUMN: (state) => {
-		state.column_selections.value.push({column: null, statement_id: null, name: null, type: null, usesource: false });
+		state.column_selections.value.push({column: null, statement_id: null, name: null, type: null, use_source: false });
 	},
 	DONE_ADDING_COLUMNS: (state) => {
 		state.column_selections.done = true;

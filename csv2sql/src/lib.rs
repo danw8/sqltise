@@ -1,11 +1,15 @@
 #[macro_use]
 extern crate serde_derive;
+extern crate wasm_bindgen_test;
+extern crate chrono;
 
 use wasm_bindgen::prelude::*;
 
 mod model;
+pub mod process;
 
-use self::model::{CsvHeaders, StatementSelections, ColumnSelections, ColumnHeader};
+use self::model::{CsvHeaders, ColumnHeader};
+pub use self::process::process_file;
 
 #[wasm_bindgen]
 extern "C" {
@@ -45,12 +49,4 @@ pub fn get_columns(file_data: &str) -> JsValue {
 	};
 
 	return JsValue::from_serde(&headers).unwrap();
-}
-
-#[wasm_bindgen]
-pub fn process_file(_data: &str, statements: JsValue, columns: JsValue) -> JsValue {
-	let _statements: StatementSelections = statements.into_serde().unwrap();
-	let _columns: ColumnSelections = columns.into_serde().unwrap();
-
-	JsValue::NULL
 }
