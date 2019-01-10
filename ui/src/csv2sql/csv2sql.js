@@ -99,9 +99,43 @@ function addHeapObject(obj) {
     heap[idx] = obj;
     return idx;
 }
+/**
+* @param {string} arg0
+* @param {any} arg1
+* @param {any} arg2
+* @returns {any}
+*/
+export function process_file(arg0, arg1, arg2) {
+    const ptr0 = passStringToWasm(arg0);
+    const len0 = WASM_VECTOR_LEN;
+    try {
+        return takeObject(wasm.process_file(ptr0, len0, addHeapObject(arg1), addHeapObject(arg2)));
+
+    } finally {
+        wasm.__wbindgen_free(ptr0, len0 * 1);
+
+    }
+
+}
+
+export function __wbindgen_object_drop_ref(i) { dropObject(i); }
 
 export function __wbindgen_json_parse(ptr, len) {
     return addHeapObject(JSON.parse(getStringFromWasm(ptr, len)));
+}
+
+let cachegetUint32Memory = null;
+function getUint32Memory() {
+    if (cachegetUint32Memory === null || cachegetUint32Memory.buffer !== wasm.memory.buffer) {
+        cachegetUint32Memory = new Uint32Array(wasm.memory.buffer);
+    }
+    return cachegetUint32Memory;
+}
+
+export function __wbindgen_json_serialize(idx, ptrptr) {
+    const ptr = passStringToWasm(JSON.stringify(getObject(idx)));
+    getUint32Memory()[ptrptr / 4] = ptr;
+    return WASM_VECTOR_LEN;
 }
 
 export function __wbindgen_throw(ptr, len) {
