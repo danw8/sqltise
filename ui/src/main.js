@@ -20,24 +20,9 @@ var default_state = function() {
 			nextid: 0,
 			value: []
 		},
-		debug: true,
+		debug: false,
 		error_solutions: [],
-		errors: [
-			{
-				statement_id: 1,
-				column_id: 1,
-				type:'VARCHAR',
-				error_text:'some failed text',
-				rows:[1,2,3,4]
-			},
-			{
-				statement_id: 2,
-				column_id: 2,
-				type:'VARCHAR',
-				error_text:'some other failed text',
-				rows:[1,2]
-			}
-		],
+		errors: [],
 	}
 };
 
@@ -54,7 +39,6 @@ var store = new Vuex.Store({
 					state.columns = result.columns;
 					state.raw_csv = data;
 					state.loaded = true;
-					//state.errors = result.errors;
 				}
 			})
 			.catch(console.error);
@@ -80,26 +64,41 @@ var store = new Vuex.Store({
 	},
 	DONE_ADDING_COLUMNS: (state) => {
 		state.column_selections.done = true;
+		csv2sql.then(m => {
+			let result = m.process_file(state.raw_csv, state.column_selections);
+			state.errors = result.value;
+		}).catch(console.error)
 	},
 	REMOVE_COLUMN: (state, index) => {
 		state.column_selections.value.splice(index, 1);
 	},
 	SOLVE_ERROR: (state, index) => {
 		
-		state.error_solutions.push(state.errors[index]);
-		state.errors.splice(index, 1);
+		let newValue = state.errors[index].error_text;
+		let type = state.errors[index].type;
+		csv2sql.then(m => {
+			let errorCorrected = m.check_correction(newValue, type);
+			if (errorCorrected)
+			{
+				state.error_solutions.push(state.errors[index]);
+				state.errors.splice(index, 1);
+			}
+		})
+
+		
 		console.log(state.error_solutions);
 	},
 	GENERATE_SQL: (state) =>
 	{
 		csv2sql
 			.then(m => {
-				console.log("this should call the generate sql endpoint in rust")
-				// let result = m.get_sql(state)
-				// if (result === "SUCCESS")
-				// {
-				// 	state.errors.splice(index, 1)
-				// }
+				console.log("this should call the generate sql endpoint in rust");
+				let result = m.generate_file(state.raw_csv, state.statements, state.column_selections, state.error_solutions);
+				console.log("What we got",result);
+				if (result.length)
+				{
+					console.log('Result', result);
+				}
 			})
 			.catch(console.error)
 	}

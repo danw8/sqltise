@@ -32,8 +32,8 @@
 			<input v-model="column.name" class="column-input"/>
 			<button id="small-column" class="remove-button" v-on:click="remove(index)"><i class="fa fa-trash"></i></button>
 		</div>
-		<button class="columns-button" v-on:click="add">Add Column<i class="fa fa-plus add-icon"></i></button>
-		<button class="columns-button" v-on:click="done" v-if="columns_complete(column_selections.value)">Done<i class="fa fa-check add-icon"></i></button>
+		<button class="columns-button" v-on:click="add">Add Column <i class="fa fa-plus add-icon"></i></button>
+		<button class="columns-button" v-on:click="done" v-if="columns_complete(column_selections.value)">Done <i class="fa fa-check add-icon"></i></button>
 	</div>
 </template>
 
