@@ -29,3 +29,16 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+### Deployment
+Depending on where the project will be hosted you should update the configuration in [vue.config.js](vue.config.js)
+```JS
+publicPath: process.env.NODE_ENV === 'production'
+    ? '' //here the relative path e.g. if you plan to host it in github pages [username].github.io/[repoName], the value if true should be [repoName]
+    : ''
+```
+Navigate into the ui directory and run
+```
+npm run build
+```

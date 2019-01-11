@@ -123,7 +123,7 @@ var store = new Vuex.Store({
 						}).name;
 						console.log("file_name:", file_name);
 
-						var blob = new Blob([data], {type: "text/plain"});
+						var blob = new Blob([data], {type: "application/sql"});
 						var url = window.URL.createObjectURL(blob);
 						state.downloads.push({ name: file_name + ".sql", url: url });
 					}
