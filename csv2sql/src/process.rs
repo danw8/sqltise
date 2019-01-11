@@ -1,12 +1,8 @@
-<<<<<<< HEAD
 use super::model::{ ColumnType, CsvError, CsvErrors, ParseError, StatementSelections, StatementType};
-=======
-use super::model::{ColumnSelections, ColumnType, CsvError, CsvErrors, ParseError};
-use super::{DATETIME_FORMATS, DATE_FORMATS};
->>>>>>> 44488d9f6934d870cef4c178ee39477181af2a75
 use chrono::{NaiveDate, NaiveDateTime};
 use wasm_bindgen::prelude::*;
 use super::log;
+use super::{DATE_FORMATS, DATETIME_FORMATS};
 
 #[wasm_bindgen]
 pub fn check_correction(value: &str, column_type: &str) -> JsValue {
@@ -47,23 +43,6 @@ pub fn process_file(data: &str, statements: JsValue) -> JsValue {
 					return JsValue::from_serde(&json).unwrap();
 				}
 			};
-<<<<<<< HEAD
-=======
-
-			if record.iter().all(|r| r.is_empty()){
-				continue;
-			}
-
-			let value = &record[id];
-
-			let error: bool = match &column.r#type {
-				ColumnType::Int => check_int_errors(value),
-				ColumnType::Float => check_float_errors(value),
-				ColumnType::Date => check_date_errors(value),
-				ColumnType::DateTime => check_date_errors(value),
-				ColumnType::VarChar => check_varchar_errors(value),
-			};
->>>>>>> 44488d9f6934d870cef4c178ee39477181af2a75
 
 			for column in &statement.column_selections.value {
 				let id = column.column;
@@ -75,7 +54,7 @@ pub fn process_file(data: &str, statements: JsValue) -> JsValue {
 					ColumnType::Int => check_int_errors(value.trim()),
 					ColumnType::Float => check_float_errors(value.trim()),
 					ColumnType::Date => check_date_errors(value.trim()),
-					ColumnType::DateTime => check_datetime_errors(value.trim()),
+					ColumnType::DateTime => check_date_errors(value.trim()),
 					ColumnType::VarChar => check_varchar_errors(value.trim()),
 				};
 
@@ -107,7 +86,7 @@ pub fn process_file(data: &str, statements: JsValue) -> JsValue {
 					ColumnType::Int => check_int_errors(value.trim()),
 					ColumnType::Float => check_float_errors(value.trim()),
 					ColumnType::Date => check_date_errors(value.trim()),
-					ColumnType::DateTime => check_datetime_errors(value.trim()),
+					ColumnType::DateTime => check_date_errors(value.trim()),
 					ColumnType::VarChar => check_varchar_errors(value.trim()),
 				};
 
