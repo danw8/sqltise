@@ -23,9 +23,10 @@
 					<button class="generate-button" v-on:click="generate">GENERATE</button>
 				</div>
 			</transition>
-			<div v-if="downloads.length > 0">
-				<a v-for="(dl, index) in downloads" :key="index" :href="dl.url" :download="dl.name">{{dl.name}}</a>
-			</div>
+		</div>
+
+		<div class="generated-file" v-for="(dl, index) in downloads" :key="index">
+			<a :href="dl.url" :download="dl.name">download {{dl.name}}</a>
 		</div>
 
 		<div v-if="debug">
@@ -126,4 +127,23 @@ export default {
 	width: 240px;
 	margin-top: 16px;
 }
+
+.generated-file{
+	margin-top: 16px;
+	width: 240px;
+	height: 60px;
+	background-color: #2c3e50;
+	cursor: pointer;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.generated-file a{
+	text-decoration: none;
+	color: white;
+	padding: 8px;
+	text-transform: uppercase;
+}
+
 </style>
