@@ -32,6 +32,7 @@ export default {
     padding: 8px;
     height: 60px;
     width: 240px;
+    cursor: pointer;
 }
 
 .reset-button:hover {

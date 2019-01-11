@@ -14,7 +14,7 @@
                     <td><input type="text" v-model="error.error_text" /></td>
                     <td>{{error.type}}</td>
                     <td>{{error.rows.length}}</td>
-                    <td><button v-on:click="solve(index)">Validate</button></td>
+                    <td><button class="validate-button" v-on:click="solve(index)">Validate</button></td>
                 </tr>
             </tbody>
         </table>
@@ -73,5 +73,17 @@ th,td {
     padding-top: 8px;
     padding-bottom: 8px;
  }
+
+ .validate-button {
+   background-color: #277554;
+	border: none;
+	color: white;
+	padding: 8px;
+    cursor: pointer;
+ }
+
+ .validate-button:hover {
+	background-color: #499273;
+}
 
 </style>

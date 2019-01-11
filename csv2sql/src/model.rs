@@ -11,7 +11,7 @@ pub struct ColumnHeader {
 
 #[derive(Serialize, Deserialize)]
 pub struct StatementSelections {
-	pub value: Vec<StatementSelection>
+	pub value: Vec<StatementSelection>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -20,23 +20,31 @@ pub struct StatementSelection {
 	pub r#type: StatementType,
 	pub name: String,
 	pub table: String,
+	pub column_selections: ColumnSelections,
+	pub r#where: WhereClause,
 }
 
 #[derive(Serialize, Deserialize)]
+pub struct WhereClause {
+	pub key: String,
+	pub value: usize,
+	pub r#type: ColumnType,
+}
+
+#[derive(Serialize, Deserialize, PartialEq)]
 pub enum StatementType {
 	Insert,
-	Update
+	Update,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct ColumnSelections {
-	pub value: Vec<ColumnSelection>
+	pub value: Vec<ColumnSelection>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct ColumnSelection {
 	pub column: usize,
-	pub statement_id: usize,
 	pub name: Option<String>,
 	pub r#type: ColumnType,
 	pub use_source: bool,
@@ -53,7 +61,7 @@ pub enum ColumnType {
 
 #[derive(Serialize, Deserialize)]
 pub struct CsvErrors {
-	pub value: Vec<CsvError>
+	pub value: Vec<CsvError>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -64,7 +72,6 @@ pub struct CsvError {
 	pub error_text: String,
 	pub rows: Vec<usize>,
 }
-
 
 #[derive(Serialize, Deserialize)]
 pub struct ParseError {

@@ -1,10 +1,9 @@
 <template>
 	<div id="app">
-		
+
 		<h1>SQLTISE</h1>
-		<!-- <button v-on:click="hello('Sucks')">Say hello from rust</button> -->
 		<Reset v-if="loaded"/>
-		
+
 		<div class="transition-wrapper">
 			<transition name="zoom">
 				<LoadCsvFile v-if="!loaded"/>
@@ -13,23 +12,27 @@
 				<SelectStatements v-if="loaded && !statements.done"/>
 			</transition>
 			<transition name="zoom">
-				<ColumnSelections v-if="statements.done && !column_selections.done"/>
+				<ColumnSelections v-if="statements.done && !statements.columnSelectionsDone"/>
 			</transition>
 			<transition name="zoom">
-				<SolveErrors v-if="errors.length > 0 && column_selections.done"/>
+				<SolveErrors v-if="errors.length > 0 && statements.columnSelectionsDone"/>
 			</transition>
 			<transition name="zoom">
-				<div v-if="errors.length === 0 && column_selections.done">
-					<button class="generate-button" v-on:click="generate">GENERATE</button>	
+				<div v-if="errors.length === 0 && statements.done && statements.columnSelectionsDone && downloads.length === 0">
+					<button class="generate-button" v-on:click="generate">GENERATE</button>
 				</div>
 			</transition>
 		 </div>
+
+		<div class="generated-file" v-for="(dl, index) in downloads" :key="index">
+			<a :href="dl.url" :download="dl.name">download {{dl.name}}</a>
+		</div>
 
 		<div v-if="debug">
 			<h3>Debug:</h3>
 			<div><pre>Columns: {{columns}}</pre></div>
 			<div><pre>Statements: {{statements}}</pre></div>
-			<div><pre>Column Selections: {{column_selections}}</pre></div>
+			<!-- <div><pre>Column Selections: {{statements.column_selections}}</pre></div> -->
 			<div><pre>Solved errors: {{error_solutions}}</pre></div>
 		</div>
 	</div>
@@ -53,9 +56,9 @@ export default {
 			'loaded',
 			'statements',
 			'debug',
-			'column_selections',
 			'errors',
-			'error_solutions'
+			'error_solutions',
+			'downloads',
 		]),
 		// other properties
 	},
@@ -90,20 +93,26 @@ export default {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	color: #2c3e50;
-	padding: 0px 30px;
-	position: fixed;
+	padding: 10px 50px;
+	
+	/* position: fixed;
     top: 50%;
     left: 50%;
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
-	text-align: center;
+	text-align: center; */
+}
+
+#app > h1 {
+	font-size: 50px;
 }
 
 .transition-wrapper {
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
-	align-items: center;
+	
+	/* justify-content: center;
+	align-items: center; */
 }
 
 .zoom-enter-active {
@@ -123,5 +132,34 @@ export default {
     height: 60px;
     width: 240px;
 	margin-top: 16px;
+	cursor: pointer;
 }
+
+.generate-button:hover {
+    background-color: #499273;
+}
+
+.generated-file{
+	margin-top: 16px;
+	width: 240px;
+	height: 60px;
+	background-color: #2c3e50;
+	cursor: pointer;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.generated-file:hover {
+	background-color:  #4c5e70;
+}
+
+.generated-file a{
+	text-decoration: none;
+	color: white;
+	padding: 8px;
+	text-transform: uppercase;
+	text-align: center;
+}
+
 </style>

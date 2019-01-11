@@ -1,20 +1,23 @@
 #[macro_use]
 extern crate serde_derive;
-extern crate wasm_bindgen_test;
 extern crate chrono;
+extern crate wasm_bindgen_test;
 
 use wasm_bindgen::prelude::*;
 
+pub mod generate;
 mod model;
 pub mod process;
-pub mod generate;
 
-use self::model::{CsvHeaders, ColumnHeader};
+use self::model::{ColumnHeader, CsvHeaders};
 pub use self::process::process_file;
 
 #[wasm_bindgen]
 extern "C" {
 	fn alert(s: &str);
+
+	#[wasm_bindgen(js_namespace = console)]
+	fn log(s: &str);
 }
 
 #[wasm_bindgen]
@@ -38,16 +41,14 @@ pub fn get_columns(file_data: &str) -> JsValue {
 	};
 
 	for (index, column) in header_value.iter().enumerate() {
-		let header = ColumnHeader{
+		let header = ColumnHeader {
 			name: column.to_string(),
-			index
+			index,
 		};
 		headers.push(header);
 	}
 
-	let headers = CsvHeaders {
-		columns: headers,
-	};
+	let headers = CsvHeaders { columns: headers };
 
 	return JsValue::from_serde(&headers).unwrap();
 }

@@ -1,39 +1,76 @@
 <template>
 	<div class="column-selections">
 		<h3>Columns</h3>
-		<div v-if="column_selections.length === 0">
-			<h5>There are no columns selected</h5>
-		</div>
-		<div class="columns-header" v-if="column_selections.value.length > 0">
-			<div>Source Column</div>
-			<div>Type</div>
-			<div>Statement</div>
-			<div id="small-column">Use Source Name</div>
-			<div>Destination Column</div>
-			<div id="small-column">Delete</div>
-		</div>
-		<div class="columns" v-for="(column, index) in column_selections.value" :key="index">
-			<select v-model="column.column" class="column-select">
-				<option v-for="(option, index) in columns" :key="index" :value="option.index">{{option.name}}</option>
-			</select>
-			<select v-model="column.type" class="column-select">
-				<option>Int</option>
-				<option>Float</option>
-				<option>Date</option>
-				<option>DateTime</option>
-				<option>VarChar</option>
-			</select>
-			<select v-model="column.statement_id" class="column-select">
-				<option v-for="(option, index) in statements.value" :key="index" :value="option.id">{{option.name}} - ({{option.table}})</option>
-			</select>
-			<div id="small-column" class="column-checkbox">
-				<input type="checkbox" id="checkbox" v-model="column.use_source"/>
+		
+		<div class="statement" v-for="(statement, index) in statements.value" :key="index" :value="statement.id">
+			
+			<div v-if="!statement.column_selections || statement.column_selections.value.length === 0">
+				<h5>There are no columns selected</h5>
 			</div>
-			<input v-model="column.name" class="column-input"/>
-			<button id="small-column" class="remove-button" v-on:click="remove(index)"><i class="fa fa-trash"></i></button>
-		</div>
-		<button class="columns-button" v-on:click="add">Add Column <i class="fa fa-plus add-icon"></i></button>
-		<button class="columns-button" v-on:click="done" v-if="columns_complete(column_selections.value)">Done <i class="fa fa-check add-icon"></i></button>
+			<div v-if="statement.column_selections">
+				<h3>{{statement.name}} - ({{statement.table}})</h3>
+				<div class="columns-header" v-if="statement.column_selections && statement.column_selections.value.length > 0">
+					<div>Source Column</div>
+					<div>Type</div>
+					<div id="small-column">Use Source Name</div>
+					<div>Destination Column</div>
+					<div id="small-column">Delete</div>
+				</div>
+				<div class="columns" v-for="(column, index2) in statement.column_selections.value" :key="index2">
+					<select v-model="column.column" class="column-select">
+						<option v-for="(option, index3) in columns" :key="index3" :value="option.index">{{option.name}}</option>
+					</select>
+					<select v-model="column.type" class="column-select">
+						<option>Int</option>
+						<option>Float</option>
+						<option>Date</option>
+						<option>DateTime</option>
+						<option>VarChar</option>
+					</select>
+					<div id="small-column" class="column-checkbox">
+						<input type="checkbox" id="checkbox" v-model="column.use_source"/>
+					</div>
+					<input v-model="column.name" class="column-input"/>
+					<button id="small-column" class="remove-button" v-on:click="remove(index, index2)"><i class="fa fa-trash"></i></button>
+				</div>
+				<button class="columns-button" v-on:click="add(index)">Add Column <i class="fa fa-plus add-icon"></i></button>
+				<table class="where-clause" v-if="statement.type === 'Update'">
+					<thead>
+						<tr>
+							<th></th>
+							<th>DB Column</th>
+							<th></th>
+							<th>Source Column</th>
+							<th>Type</th>
+						</tr>	
+					</thead>
+					<tbody>
+						<tr>
+							<td class="where-text">WHERE</td>
+							<td>
+								<input v-model="statement.where.key" class="column-input"/>
+							</td>
+							<td class="equals">=</td>
+							<td>
+								<select v-model="statement.where.value" class="column-select">
+									<option v-for="(option, index4) in columns" :key="index4" :value="option.index">{{option.name}}</option>
+								</select>
+							</td>
+							<td>
+								<select v-model="statement.where.type" class="column-select">
+									<option>Int</option>
+									<option>Float</option>
+									<option>Date</option>
+									<option>DateTime</option>
+									<option>VarChar</option>
+								</select>
+							</td>
+						</tr>	
+					</tbody>
+				</table>
+			</div> 
+		</div>	
+		<button class="columns-button" v-on:click="done" v-if="columns_complete(statements)">Done <i class="fa fa-check add-icon"></i></button>
 	</div>
 </template>
 
@@ -48,30 +85,44 @@ export default {
 			'DONE_ADDING_COLUMNS',
 			'REMOVE_COLUMN',
 		]),
-		add: function () {
-			this.ADD_COLUMN();
+		add: function (index) {
+			this.ADD_COLUMN(index);
 		},
 		done: function () {
 			this.DONE_ADDING_COLUMNS();
 		},
-		columns_complete: function(columns) {
-			if (!columns || columns.length === 0){
-				return false;
-			}
-			return columns.every((s) => {
-					return s.column != undefined && s.statement_id != undefined  && !!s.type && (!!s.name || s.use_source) && !(!!s.name && s.use_source)
-				});
+		columns_complete: function(statements) {
+			let completed;
+			statements.value.forEach(statement => {
+				let columns = statement.column_selections.value;
+				if (!columns || columns.length === 0) {
+					return false;
+				}
+
+				if (statement.type === 'Update' && (!statement.where.key || statement.where.value == undefined || statement.where.type == undefined )) {
+					return false;
+				}
+
+				completed =  columns.every((s) => {
+						return s.column != undefined && !!s.type && (!!s.name || s.use_source) && !(!!s.name && s.use_source)
+					});	
+
+				if (!completed)	{
+					return completed;
+				}
+			});
+			return completed;
 		},
-		remove: function(index) {
-			this.REMOVE_COLUMN(index);
+		remove: function(index, index2) {
+			this.REMOVE_COLUMN(index, index2);
 		},
 		// other methods
 	},
 	computed: {
 		...mapState([
 			'columns',
-			'column_selections',
 			'statements',
+			'selected_column'
 		]),
 		// other properties
 	},
@@ -90,6 +141,7 @@ export default {
 	color: white;
 	padding: 8px;
 	margin-right: 16px;
+	cursor: pointer;
 }
 
 .columns-button:hover {
@@ -159,5 +211,23 @@ export default {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
+
+.statement {
+	border: 1px solid black;
+	padding: 16px;
+	margin-bottom: 16px;
+}
+
+.where-clause {
+	margin-top: 16px;
+}
+
+.where-text {
+	padding-right: 8px;
+}
+
+.equals {
+	padding-right: 15px;
 }
 </style>
