@@ -1,10 +1,10 @@
 <template>
 	<div id="app">
-		
+
 		<h1>SQLTISE</h1>
 		<!-- <button v-on:click="hello('Sucks')">Say hello from rust</button> -->
 		<Reset v-if="loaded"/>
-		
+
 		<div class="transition-wrapper">
 			<transition name="zoom">
 				<LoadCsvFile v-if="!loaded"/>
@@ -20,10 +20,13 @@
 			</transition>
 			<transition name="zoom">
 				<div v-if="errors.length === 0 && column_selections.done">
-					<button class="generate-button" v-on:click="generate">GENERATE</button>	
+					<button class="generate-button" v-on:click="generate">GENERATE</button>
 				</div>
 			</transition>
-		 </div>
+			<div v-if="downloads.length > 0">
+				<a v-for="(dl, index) in downloads" :key="index" :href="dl.url" :download="dl.name">{{dl.name}}</a>
+			</div>
+		</div>
 
 		<div v-if="debug">
 			<h3>Debug:</h3>
@@ -55,7 +58,8 @@ export default {
 			'debug',
 			'column_selections',
 			'errors',
-			'error_solutions'
+			'error_solutions',
+			'downloads',
 		]),
 		// other properties
 	},
@@ -80,9 +84,9 @@ export default {
 
 <style>
 /* body {
-    display: inline-block;
-    vertical-align: middle;
-    max-width: 38rem;
+	display: inline-block;
+	vertical-align: middle;
+	max-width: 38rem;
 }; */
 
 #app {
@@ -91,11 +95,11 @@ export default {
 	-moz-osx-font-smoothing: grayscale;
 	color: #2c3e50;
 	padding: 0px 30px;
-	    position: fixed;
-    top: 50%;
-    left: 50%;
-    -webkit-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
+		position: fixed;
+	top: 50%;
+	left: 50%;
+	-webkit-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
 	text-align: center;
 }
 
@@ -114,12 +118,12 @@ export default {
 
 .generate-button{
 	background-color: #277554;
-    border: none;
-    color: white;
-    font-size: 1.25em;
-    padding: 8px;
-    height: 60px;
-    width: 240px;
+	border: none;
+	color: white;
+	font-size: 1.25em;
+	padding: 8px;
+	height: 60px;
+	width: 240px;
 	margin-top: 16px;
 }
 </style>
