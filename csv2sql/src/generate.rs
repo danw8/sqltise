@@ -1,9 +1,11 @@
-//use super::log;
+use super::log;
+use super::{DATETIME_FORMATS, DATE_FORMATS};
 use super::model::{
 	ColumnHeader, ColumnSelection, ColumnSelections, ColumnType, CsvErrors, ParseError,
 	StatementSelections, StatementType,
 };
 use wasm_bindgen::prelude::*;
+use chrono::{ NaiveDateTime, NaiveDate};
 
 #[wasm_bindgen]
 pub fn generate_file(
@@ -61,6 +63,10 @@ pub fn generate_file(
 				}
 			};
 
+            if record.iter().all(|r| r.is_empty()){
+				continue;
+			}
+
 			let mut output_columns: Vec<(String, String)> = Vec::new();
 
 			for ref column in &statement_columns {
@@ -87,9 +93,17 @@ pub fn generate_file(
 						value = format!("'{}'", value);
 					}
 					ColumnType::Date => {
+                        let date = parse_datetime(&value);
+                        if date.is_ok() {
+                            value = date.unwrap().format("%Y-%m-%d").to_string();
+                        }
 						value = format!("'{}'", value);
 					}
 					ColumnType::DateTime => {
+                        let date = parse_datetime(&value);
+                        if date.is_ok() {
+                            value = date.unwrap().format("%Y-%m-%d %H:%M:%S").to_string();
+                        }
 						value = format!("'{}'", value);
 					}
 					_ => {}
@@ -126,4 +140,24 @@ pub fn generate_file(
 		results.push(statement_lines.join("\n"));
 	}
 	return JsValue::from_serde(&results).unwrap();
+}
+
+fn parse_datetime(value: &str) -> Result<NaiveDateTime, String> {
+    let value = value.trim();
+    for format in &DATETIME_FORMATS {
+        let parsed = NaiveDateTime::parse_from_str(value, format);
+        if  parsed.is_ok() {
+            return Ok(parsed.unwrap());
+        }
+    }
+
+    for format in &DATE_FORMATS {
+        let parsed = NaiveDate::parse_from_str(value, format);
+        if  parsed.is_ok() {
+            return Ok(parsed.unwrap().and_hms(0,0,0));
+        }
+    }
+
+    log("No Formats Match");
+    Err("No Formats Match".to_string())
 }

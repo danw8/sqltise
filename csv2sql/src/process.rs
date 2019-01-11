@@ -1,15 +1,16 @@
 use super::model::{ColumnSelections, ColumnType, CsvError, CsvErrors, ParseError};
+use super::{DATETIME_FORMATS, DATE_FORMATS};
 use chrono::{NaiveDate, NaiveDateTime};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub fn check_correction(value: &str, column_type: &str) -> JsValue {
 	let error = match column_type {
-		"Int" => check_int_errors(value.trim()),
-		"Float" => check_float_errors(value.trim()),
-		"Date" => check_date_errors(value.trim()),
-		"DateTime" => check_datetime_errors(value.trim()),
-		"VarChar" => check_varchar_errors(value.trim()),
+		"Int" => check_int_errors(value),
+		"Float" => check_float_errors(value),
+		"Date" => check_date_errors(value),
+		"DateTime" => check_date_errors(value),
+		"VarChar" => check_varchar_errors(value),
 		_ => false,
 	};
 	return JsValue::from_bool(!error);
@@ -39,14 +40,19 @@ pub fn process_file(data: &str, columns: JsValue) -> JsValue {
 					return JsValue::from_serde(&json).unwrap();
 				}
 			};
+
+			if record.iter().all(|r| r.is_empty()){
+				continue;
+			}
+
 			let value = &record[id];
 
 			let error: bool = match &column.r#type {
-				ColumnType::Int => check_int_errors(value.trim()),
-				ColumnType::Float => check_float_errors(value.trim()),
-				ColumnType::Date => check_date_errors(value.trim()),
-				ColumnType::DateTime => check_datetime_errors(value.trim()),
-				ColumnType::VarChar => check_varchar_errors(value.trim()),
+				ColumnType::Int => check_int_errors(value),
+				ColumnType::Float => check_float_errors(value),
+				ColumnType::Date => check_date_errors(value),
+				ColumnType::DateTime => check_date_errors(value),
+				ColumnType::VarChar => check_varchar_errors(value),
 			};
 
 			if error {
@@ -74,6 +80,7 @@ pub fn process_file(data: &str, columns: JsValue) -> JsValue {
 }
 
 fn check_int_errors(value: &str) -> bool {
+	let value = value.trim();
 	if is_null(value) {
 		return false;
 	}
@@ -81,6 +88,7 @@ fn check_int_errors(value: &str) -> bool {
 }
 
 fn check_float_errors(value: &str) -> bool {
+	let value = value.trim();
 	if is_null(value) {
 		return false;
 	}
@@ -88,37 +96,31 @@ fn check_float_errors(value: &str) -> bool {
 }
 
 fn check_date_errors(value: &str) -> bool {
+	let value = value.trim();
 	if is_null(value) {
 		return false;
 	}
-	!(NaiveDate::parse_from_str(value, "%F").is_ok()
-		|| NaiveDate::parse_from_str(value, "%D").is_ok()
-		|| NaiveDate::parse_from_str(value, "%v").is_ok()
-		|| NaiveDate::parse_from_str(value, "%Y-%m-%d").is_ok()
-		|| NaiveDate::parse_from_str(value, "%m/%d/%Y").is_ok()
-		|| NaiveDate::parse_from_str(value, r#"%m\%d\%Y"#).is_ok())
+
+	for format in &DATETIME_FORMATS {
+        let parsed = NaiveDateTime::parse_from_str(value.trim(), format);
+        if  parsed.is_ok() {
+            return false;
+        }
+    }
+
+	for format in &DATE_FORMATS {
+		let parsed = NaiveDate::parse_from_str(value.trim(), format);
+        if  parsed.is_ok() {
+            return false;
+        }
+	}
+
+	return true;
 }
 
-fn check_datetime_errors(value: &str) -> bool {
-	if is_null(value) {
-		return false;
-	}
-	!(NaiveDateTime::parse_from_str(value, "%F %R").is_ok()
-		|| NaiveDateTime::parse_from_str(value, "%F %T").is_ok()
-		|| NaiveDateTime::parse_from_str(value, "%F %X").is_ok()
-		|| NaiveDateTime::parse_from_str(value, "%F %r").is_ok()
-		|| NaiveDateTime::parse_from_str(value, "%D %R").is_ok()
-		|| NaiveDateTime::parse_from_str(value, "%D %T").is_ok()
-		|| NaiveDateTime::parse_from_str(value, "%D %X").is_ok()
-		|| NaiveDateTime::parse_from_str(value, "%D %r").is_ok()
-		|| NaiveDateTime::parse_from_str(value, "%v %R").is_ok()
-		|| NaiveDateTime::parse_from_str(value, "%v %T").is_ok()
-		|| NaiveDateTime::parse_from_str(value, "%v %X").is_ok()
-		|| NaiveDateTime::parse_from_str(value, "%v %r").is_ok()
-		|| NaiveDateTime::parse_from_str(value, "%Y-%m-%d %H:%M:%S").is_ok())
-}
 
 fn check_varchar_errors(value: &str) -> bool {
+	let value = value.trim();
 	if is_null(value) {
 		return false;
 	}
@@ -126,6 +128,7 @@ fn check_varchar_errors(value: &str) -> bool {
 }
 
 fn is_null(value: &str) -> bool {
+	let value = value.trim();
 	value.to_lowercase() == "null"
 }
 
