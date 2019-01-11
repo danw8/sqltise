@@ -91,7 +91,7 @@ export default {
 	-moz-osx-font-smoothing: grayscale;
 	color: #2c3e50;
 	padding: 0px 30px;
-	    position: fixed;
+	position: fixed;
     top: 50%;
     left: 50%;
     -webkit-transform: translate(-50%, -50%);
@@ -102,6 +102,8 @@ export default {
 .transition-wrapper {
 	display: flex;
 	flex-direction: row;
+	justify-content: center;
+	align-items: center;
 }
 
 .zoom-enter-active {
