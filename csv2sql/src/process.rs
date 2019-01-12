@@ -1,8 +1,10 @@
-use super::model::{ ColumnType, CsvError, CsvErrors, ParseError, StatementSelections, StatementType};
+use super::log;
+use super::model::{
+	ColumnType, CsvError, CsvErrors, ParseError, StatementSelections, StatementType,
+};
+use super::{DATETIME_FORMATS, DATE_FORMATS};
 use chrono::{NaiveDate, NaiveDateTime};
 use wasm_bindgen::prelude::*;
-use super::log;
-use super::{DATE_FORMATS, DATETIME_FORMATS};
 
 #[wasm_bindgen]
 pub fn check_correction(value: &str, column_type: &str) -> JsValue {
@@ -19,7 +21,7 @@ pub fn check_correction(value: &str, column_type: &str) -> JsValue {
 
 #[wasm_bindgen]
 pub fn process_file(data: &str, statements: JsValue) -> JsValue {
-	let statements :StatementSelections = statements.into_serde().unwrap(); 
+	let statements: StatementSelections = statements.into_serde().unwrap();
 	//let columns: ColumnSelections = columns.into_serde().unwrap();
 
 	let mut errors: Vec<CsvError> = Vec::new();
@@ -32,7 +34,6 @@ pub fn process_file(data: &str, statements: JsValue) -> JsValue {
 			.from_reader(data.as_bytes());
 
 		for (index, row) in reader.records().enumerate() {
-
 			let mut column_errors: Vec<CsvError> = Vec::new();
 
 			let record = match row {
@@ -46,7 +47,6 @@ pub fn process_file(data: &str, statements: JsValue) -> JsValue {
 
 			for column in &statement.column_selections.value {
 				let id = column.column;
-				
 
 				let value = &record[id];
 
@@ -79,10 +79,11 @@ pub fn process_file(data: &str, statements: JsValue) -> JsValue {
 
 			if statement.r#type == StatementType::Update {
 				let mut where_errors: Vec<CsvError> = Vec::new();
-				let column_id = statement.r#where.value;
-				let value = &record[column_id];
+				let where_column_id = statement.r#where.value.unwrap();
+				let where_column_type = statement.r#where.r#type.clone().unwrap();
+				let value = &record[where_column_id];
 
-				let error: bool = match &statement.r#where.r#type {
+				let error: bool = match where_column_type {
 					ColumnType::Int => check_int_errors(value.trim()),
 					ColumnType::Float => check_float_errors(value.trim()),
 					ColumnType::Date => check_date_errors(value.trim()),
@@ -91,22 +92,19 @@ pub fn process_file(data: &str, statements: JsValue) -> JsValue {
 				};
 
 				if error {
-					if let Some(e) = where_errors
-						.iter_mut()
-						.find(|i| &(**i).error_text == value)
-					{
+					if let Some(e) = where_errors.iter_mut().find(|i| &(**i).error_text == value) {
 						e.rows.push(index);
 					} else {
 						where_errors.push(CsvError {
 							statement_id,
-							column_id: column_id,
-							r#type: statement.r#where.r#type.clone(),
+							column_id: where_column_id,
+							r#type: where_column_type.clone(),
 							error_text: value.to_string(),
 							rows: vec![index],
 						});
 					}
 				}
-				
+
 				errors.append(&mut where_errors);
 			}
 		}
@@ -139,22 +137,21 @@ fn check_date_errors(value: &str) -> bool {
 	}
 
 	for format in &DATETIME_FORMATS {
-        let parsed = NaiveDateTime::parse_from_str(value.trim(), format);
-        if  parsed.is_ok() {
-            return false;
-        }
-    }
+		let parsed = NaiveDateTime::parse_from_str(value.trim(), format);
+		if parsed.is_ok() {
+			return false;
+		}
+	}
 
 	for format in &DATE_FORMATS {
 		let parsed = NaiveDate::parse_from_str(value.trim(), format);
-        if  parsed.is_ok() {
-            return false;
-        }
+		if parsed.is_ok() {
+			return false;
+		}
 	}
 
 	return true;
 }
-
 
 fn check_varchar_errors(value: &str) -> bool {
 	let value = value.trim();

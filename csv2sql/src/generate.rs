@@ -1,18 +1,13 @@
 use super::log;
-use super::{DATETIME_FORMATS, DATE_FORMATS};
 use super::model::{
-	ColumnHeader, ColumnType, CsvErrors, ParseError,
-	StatementSelections, StatementType,
+	ColumnHeader, ColumnType, CsvErrors, ParseError, StatementSelections, StatementType,
 };
+use super::{DATETIME_FORMATS, DATE_FORMATS};
+use chrono::{NaiveDate, NaiveDateTime};
 use wasm_bindgen::prelude::*;
-use chrono::{ NaiveDateTime, NaiveDate};
 
 #[wasm_bindgen]
-pub fn generate_file(
-	data: &str,
-	statements: JsValue,
-	corrections: JsValue,
-) -> JsValue {
+pub fn generate_file(data: &str, statements: JsValue, corrections: JsValue) -> JsValue {
 	let statements: StatementSelections = statements.into_serde().unwrap();
 	let corrections: CsvErrors = corrections
 		.into_serde()
@@ -54,7 +49,7 @@ pub fn generate_file(
 				}
 			};
 
-            if record.iter().all(|r| r.is_empty()){
+			if record.iter().all(|r| r.is_empty()) {
 				continue;
 			}
 
@@ -80,22 +75,34 @@ pub fn generate_file(
 				// Format the values here to meet the requirement of the type
 				match column.r#type {
 					ColumnType::VarChar => {
-						value = str::replace(&value, "'", "''");
-						value = format!("'{}'", value);
+						if !is_null(&value) {
+							value = str::replace(&value, "'", "''");
+							value = format!("'{}'", value);
+						} else {
+							value = "NULL".to_string();
+						}
 					}
 					ColumnType::Date => {
-                        let date = parse_datetime(&value);
-                        if date.is_ok() {
-                            value = date.unwrap().format("%Y-%m-%d").to_string();
-                        }
-						value = format!("'{}'", value);
+						if !is_null(&value) {
+							let date = parse_datetime(&value);
+							if date.is_ok() {
+								value = date.unwrap().format("%Y-%m-%d").to_string();
+							}
+							value = format!("'{}'", value);
+						} else {
+							value = "NULL".to_string();
+						}
 					}
 					ColumnType::DateTime => {
-                        let date = parse_datetime(&value);
-                        if date.is_ok() {
-                            value = date.unwrap().format("%Y-%m-%d %H:%M:%S").to_string();
-                        }
-						value = format!("'{}'", value);
+						if !is_null(&value) {
+							let date = parse_datetime(&value);
+							if date.is_ok() {
+								value = date.unwrap().format("%Y-%m-%d %H:%M:%S").to_string();
+							}
+							value = format!("'{}'", value);
+						} else {
+							value = "NULL".to_string();
+						}
 					}
 					_ => {}
 				}
@@ -119,19 +126,25 @@ pub fn generate_file(
 					)
 				}
 				StatementType::Update => {
-					let sets = output_columns.iter()
-					    .map(|(c, v)| format!("{} = {}", c, v))
-					    .collect::<Vec<String>>().join(", ");
-					let mut column_value = record[statement.r#where.value].to_string();
+					let sets = output_columns
+						.iter()
+						.map(|(c, v)| format!("{} = {}", c, v))
+						.collect::<Vec<String>>()
+						.join(", ");
+					let where_column_id = statement.r#where.value.unwrap();
+					let mut column_value = record[where_column_id].to_string();
 					if let Some(correction) = corrections.value.iter().find(|c| {
-						c.column_id == statement.r#where.value
+						c.column_id == where_column_id
 							&& c.statement_id == statement.id
 							&& c.rows.iter().any(|&r| r == index)
 					}) {
 						column_value = correction.error_text.clone();
 					}
-					let where_clause = format!("{} = {}", statement.r#where.key, column_value); 
-					format!("UPDATE {} SET {} WHERE {};", statement.table, sets, where_clause)
+					let where_clause = format!("{} = {}", statement.r#where.key, column_value);
+					format!(
+						"UPDATE {} SET {} WHERE {};",
+						statement.table, sets, where_clause
+					)
 				}
 			};
 			statement_lines.push(output);
@@ -142,21 +155,26 @@ pub fn generate_file(
 }
 
 fn parse_datetime(value: &str) -> Result<NaiveDateTime, String> {
-    let value = value.trim();
-    for format in &DATETIME_FORMATS {
-        let parsed = NaiveDateTime::parse_from_str(value, format);
-        if  parsed.is_ok() {
-            return Ok(parsed.unwrap());
-        }
-    }
+	let value = value.trim();
+	for format in &DATETIME_FORMATS {
+		let parsed = NaiveDateTime::parse_from_str(value, format);
+		if parsed.is_ok() {
+			return Ok(parsed.unwrap());
+		}
+	}
 
-    for format in &DATE_FORMATS {
-        let parsed = NaiveDate::parse_from_str(value, format);
-        if  parsed.is_ok() {
-            return Ok(parsed.unwrap().and_hms(0,0,0));
-        }
-    }
+	for format in &DATE_FORMATS {
+		let parsed = NaiveDate::parse_from_str(value, format);
+		if parsed.is_ok() {
+			return Ok(parsed.unwrap().and_hms(0, 0, 0));
+		}
+	}
 
-    log("No Formats Match");
-    Err("No Formats Match".to_string())
+	log("No Formats Match");
+	Err("No Formats Match".to_string())
+}
+
+fn is_null(value: &str) -> bool {
+	let value = value.trim();
+	value.to_lowercase() == "null"
 }

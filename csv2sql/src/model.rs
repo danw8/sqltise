@@ -27,8 +27,8 @@ pub struct StatementSelection {
 #[derive(Serialize, Deserialize)]
 pub struct WhereClause {
 	pub key: String,
-	pub value: usize,
-	pub r#type: ColumnType,
+	pub value: Option<usize>,
+	pub r#type: Option<ColumnType>,
 }
 
 #[derive(Serialize, Deserialize, PartialEq)]

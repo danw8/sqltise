@@ -22,7 +22,7 @@
 					<button class="generate-button" v-on:click="generate">GENERATE</button>
 				</div>
 			</transition>
-		 </div>
+		</div>
 
 		<div class="generated-file" v-for="(dl, index) in downloads" :key="index">
 			<a :href="dl.url" :download="dl.name">download {{dl.name}}</a>
@@ -83,9 +83,9 @@ export default {
 
 <style>
 /* body {
-    display: inline-block;
-    vertical-align: middle;
-    max-width: 38rem;
+	display: inline-block;
+	vertical-align: middle;
+	max-width: 38rem;
 }; */
 
 #app {
@@ -94,12 +94,12 @@ export default {
 	-moz-osx-font-smoothing: grayscale;
 	color: #2c3e50;
 	padding: 10px 50px;
-	
+
 	/* position: fixed;
-    top: 50%;
-    left: 50%;
-    -webkit-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
+	top: 50%;
+	left: 50%;
+	-webkit-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%);
 	text-align: center; */
 }
 
@@ -110,7 +110,7 @@ export default {
 .transition-wrapper {
 	display: flex;
 	flex-direction: row;
-	
+
 	/* justify-content: center;
 	align-items: center; */
 }
@@ -125,18 +125,18 @@ export default {
 
 .generate-button{
 	background-color: #277554;
-    border: none;
-    color: white;
-    font-size: 1.25em;
-    padding: 8px;
-    height: 60px;
-    width: 240px;
+	border: none;
+	color: white;
+	font-size: 1.25em;
+	padding: 8px;
+	height: 60px;
+	width: 240px;
 	margin-top: 16px;
 	cursor: pointer;
 }
 
 .generate-button:hover {
-    background-color: #499273;
+	background-color: #499273;
 }
 
 .generated-file{

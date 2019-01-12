@@ -65,13 +65,21 @@ var store = new Vuex.Store({
 		},
 		ADD_STATEMENT: (state) => {
 			var id = state.statements.nextid++;
-			state.statements.value.push({
-				 column_selections: { value: [{column: null, name: null, type: null, use_source: false }], done: false },
+			var new_statement = {
+				 column_selections: {
+					 value: [{
+						 column: null,
+						 name: null,
+						 type: null,
+						 use_source: false }],
+					done: false },
 				 id: id,
 				 type: null,
 				 name: 'New Statement',
 				 table: '',
-				 where: {key: '', value: null, type: null}});
+				 where: {key: '', value: null, type: null}
+			};
+			state.statements.value.push(new_statement);
 		},
 		REMOVE_STATEMENT: (state, index) => {
 			state.statements.value.splice(index, 1);

@@ -12,16 +12,9 @@ pub mod process;
 use self::model::{ColumnHeader, CsvHeaders};
 pub use self::process::process_file;
 
-const DATE_FORMATS : [&str; 6] = [
-	"%F",
-	"%D",
-	"%v",
-	"%Y-%m-%d",
-	"%m/%d/%Y",
-	r#"%m\%d\%Y"#,
-];
+const DATE_FORMATS: [&str; 6] = ["%F", "%D", "%v", "%Y-%m-%d", "%m/%d/%Y", r#"%m\%d\%Y"#];
 
-const DATETIME_FORMATS : [&str; 8] = [
+const DATETIME_FORMATS: [&str; 8] = [
 	"%+",
 	"%c",
 	"%m/%d/%Y %H:%M:%S",
