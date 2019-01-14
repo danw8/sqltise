@@ -501,7 +501,7 @@ export function __wbindgen_jsval_eq(a, b) {
     return getObject(a) === getObject(b) ? 1 : 0;
 }
 
-export function __wbindgen_closure_wrapper2934(a, b, _ignored) {
+export function __wbindgen_closure_wrapper2936(a, b, _ignored) {
     const f = wasm.__wbg_function_table.get(113);
     const d = wasm.__wbg_function_table.get(114);
     const cb = function(arg0) {

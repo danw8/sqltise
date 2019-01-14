@@ -33,8 +33,9 @@ pub fn process_file(data: &str, statements: JsValue) -> JsValue {
 			.has_headers(true)
 			.from_reader(data.as_bytes());
 
+		let mut column_errors: Vec<CsvError> = Vec::new();
+
 		for (index, row) in reader.records().enumerate() {
-			let mut column_errors: Vec<CsvError> = Vec::new();
 
 			let record = match row {
 				Ok(r) => r,
@@ -65,10 +66,12 @@ pub fn process_file(data: &str, statements: JsValue) -> JsValue {
 				if error {
 					if let Some(e) = column_errors
 						.iter_mut()
-						.find(|i| &(**i).error_text == value)
+						.find(|i| &(**i).error_text == value && &(**i).column_id == &id)
 					{
+						log("duplicate error");
 						e.rows.push(index);
 					} else {
+						log("not a duplicate error");
 						column_errors.push(CsvError {
 							statement_id,
 							column_id: id,
@@ -79,7 +82,6 @@ pub fn process_file(data: &str, statements: JsValue) -> JsValue {
 					}
 				}
 			}
-			errors.append(&mut column_errors);
 
 			if statement.r#type == StatementType::Update {
 				let mut where_errors: Vec<CsvError> = Vec::new();
@@ -96,7 +98,7 @@ pub fn process_file(data: &str, statements: JsValue) -> JsValue {
 				};
 
 				if error {
-					if let Some(e) = where_errors.iter_mut().find(|i| &(**i).error_text == value) {
+					if let Some(e) = where_errors.iter_mut().find(|i| &(**i).error_text == value && &(**i).column_id == &where_column_id) {
 						e.rows.push(index);
 					} else {
 						where_errors.push(CsvError {
@@ -108,10 +110,10 @@ pub fn process_file(data: &str, statements: JsValue) -> JsValue {
 						});
 					}
 				}
-
-				errors.append(&mut where_errors);
 			}
 		}
+
+		errors.append(&mut column_errors);
 	}
 
 	let csv_error = CsvErrors { value: errors };
