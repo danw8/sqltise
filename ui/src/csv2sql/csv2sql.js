@@ -162,9 +162,8 @@ export function generate_file(arg0, arg1, arg2) {
 
 }
 
-export function __wbg_log_74d904c418cf24db(arg0, arg1) {
-    let varg0 = getStringFromWasm(arg0, arg1);
-    console.log(varg0);
+export function __wbg_self_1ec1c3e6d75f31d7(arg0) {
+    return addHeapObject(getObject(arg0).self);
 }
 
 let cachegetUint32Memory = null;
@@ -173,6 +172,49 @@ function getUint32Memory() {
         cachegetUint32Memory = new Uint32Array(wasm.memory.buffer);
     }
     return cachegetUint32Memory;
+}
+
+export function __wbg_stack_27fca1c99e84b66f(ret, arg0) {
+
+    const retptr = passStringToWasm(getObject(arg0).stack);
+    const retlen = WASM_VECTOR_LEN;
+    const mem = getUint32Memory();
+    mem[ret / 4] = retptr;
+    mem[ret / 4 + 1] = retlen;
+
+}
+
+export function __wbg_static_accessor_document_b0c76025fc904ba5() {
+    return addHeapObject(document);
+}
+
+export function __wbg_getElementById_b568d9288b16b48f(arg0, arg1, arg2) {
+    let varg1 = getStringFromWasm(arg1, arg2);
+    return addHeapObject(getObject(arg0).getElementById(varg1));
+}
+
+export function __wbg_innerhtml_12e39d90d691cea1(ret, arg0) {
+
+    const retptr = passStringToWasm(getObject(arg0).innerHTML);
+    const retlen = WASM_VECTOR_LEN;
+    const mem = getUint32Memory();
+    mem[ret / 4] = retptr;
+    mem[ret / 4 + 1] = retlen;
+
+}
+
+export function __wbg_setinnerhtml_bc8921a1ce6b1b82(arg0, arg1, arg2) {
+    let varg1 = getStringFromWasm(arg1, arg2);
+    getObject(arg0).innerHTML = varg1;
+}
+
+export function __wbg_stack_a8569ef64277dd4e(arg0) {
+    return addHeapObject(getObject(arg0).stack);
+}
+
+export function __wbg_log_74d904c418cf24db(arg0, arg1) {
+    let varg0 = getStringFromWasm(arg0, arg1);
+    console.log(varg0);
 }
 
 export function __wbg_String_5380427aff8fe7c7(ret, arg0) {
@@ -245,48 +287,6 @@ export function __wbgtest_console_error(arg0, arg1) {
 
 }
 
-export function __wbg_self_1ec1c3e6d75f31d7(arg0) {
-    return addHeapObject(getObject(arg0).self);
-}
-
-export function __wbg_stack_27fca1c99e84b66f(ret, arg0) {
-
-    const retptr = passStringToWasm(getObject(arg0).stack);
-    const retlen = WASM_VECTOR_LEN;
-    const mem = getUint32Memory();
-    mem[ret / 4] = retptr;
-    mem[ret / 4 + 1] = retlen;
-
-}
-
-export function __wbg_static_accessor_document_b0c76025fc904ba5() {
-    return addHeapObject(document);
-}
-
-export function __wbg_getElementById_b568d9288b16b48f(arg0, arg1, arg2) {
-    let varg1 = getStringFromWasm(arg1, arg2);
-    return addHeapObject(getObject(arg0).getElementById(varg1));
-}
-
-export function __wbg_innerhtml_12e39d90d691cea1(ret, arg0) {
-
-    const retptr = passStringToWasm(getObject(arg0).innerHTML);
-    const retlen = WASM_VECTOR_LEN;
-    const mem = getUint32Memory();
-    mem[ret / 4] = retptr;
-    mem[ret / 4 + 1] = retlen;
-
-}
-
-export function __wbg_setinnerhtml_bc8921a1ce6b1b82(arg0, arg1, arg2) {
-    let varg1 = getStringFromWasm(arg1, arg2);
-    getObject(arg0).innerHTML = varg1;
-}
-
-export function __wbg_stack_a8569ef64277dd4e(arg0) {
-    return addHeapObject(getObject(arg0).stack);
-}
-
 export function __wbg_forEach_7796ea23499aa552(arg0, arg1, arg2) {
     let cbarg1 = function(arg0, arg1, arg2) {
         let a = this.a;
@@ -300,7 +300,7 @@ export function __wbg_forEach_7796ea23499aa552(arg0, arg1, arg2) {
         }
 
     };
-    cbarg1.f = wasm.__wbg_function_table.get(139);
+    cbarg1.f = wasm.__wbg_function_table.get(142);
     cbarg1.a = arg1;
     cbarg1.b = arg2;
     try {
@@ -370,7 +370,7 @@ export function __wbg_new_bdd94b8735e4f66d(arg0, arg1) {
         }
 
     };
-    cbarg0.f = wasm.__wbg_function_table.get(134);
+    cbarg0.f = wasm.__wbg_function_table.get(135);
     cbarg0.a = arg0;
     cbarg0.b = arg1;
     try {
@@ -501,7 +501,7 @@ export function __wbindgen_jsval_eq(a, b) {
     return getObject(a) === getObject(b) ? 1 : 0;
 }
 
-export function __wbindgen_closure_wrapper2947(a, b, _ignored) {
+export function __wbindgen_closure_wrapper2934(a, b, _ignored) {
     const f = wasm.__wbg_function_table.get(113);
     const d = wasm.__wbg_function_table.get(114);
     const cb = function(arg0) {
@@ -528,3 +528,4 @@ export function __wbindgen_closure_wrapper2947(a, b, _ignored) {
 export function __wbindgen_throw(ptr, len) {
     throw new Error(getStringFromWasm(ptr, len));
 }
+

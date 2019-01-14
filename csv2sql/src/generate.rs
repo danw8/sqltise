@@ -49,7 +49,7 @@ pub fn generate_file(data: &str, statements: JsValue, corrections: JsValue) -> J
 				}
 			};
 
-			if record.iter().all(|r| r.is_empty()) {
+			if record.iter().all(|r| r.trim().is_empty()) {
 				continue;
 			}
 

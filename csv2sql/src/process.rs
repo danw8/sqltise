@@ -45,6 +45,10 @@ pub fn process_file(data: &str, statements: JsValue) -> JsValue {
 				}
 			};
 
+			if record.iter().all(|r| r.trim().is_empty()) {
+				continue;
+			}
+
 			for column in &statement.column_selections.value {
 				let id = column.column;
 
