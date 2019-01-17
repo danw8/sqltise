@@ -60,12 +60,14 @@ fn process_file_impl(data: &str, statements: StatementSelections) -> Result<Vec<
 			process_record_for_statment(&record, index, &statement, &mut errors);
 
 			if statement.r#type == StatementType::Update {
-				let column_id = statement.r#where.value.unwrap();
-				let column_type = statement.r#where.r#type.clone().unwrap();
-				let value = &record[column_id];
+				for condition in &statement.where_selections {
+					let column_id = condition.value.unwrap();
+					let column_type = condition.r#type.clone().unwrap();
+					let value = &record[column_id];
 
-				if check_for_error(&column_type, value) {
-					add_error(&mut errors, value, statement.id, column_id, index, &column_type);
+					if check_for_error(&column_type, value) {
+						add_error(&mut errors, value, statement.id, column_id, index, &column_type);
+					}
 				}
 			}
 		}

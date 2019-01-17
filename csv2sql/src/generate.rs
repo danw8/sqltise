@@ -73,39 +73,7 @@ pub fn generate_file(data: &str, statements: JsValue, corrections: JsValue) -> J
 				};
 
 				// Format the values here to meet the requirement of the type
-				match column.r#type {
-					ColumnType::VarChar => {
-						if !is_null(&value) {
-							value = str::replace(&value, "'", "''");
-							value = format!("'{}'", value);
-						} else {
-							value = "NULL".to_string();
-						}
-					}
-					ColumnType::Date => {
-						if !is_null(&value) {
-							let date = parse_datetime(&value);
-							if date.is_ok() {
-								value = date.unwrap().format("%Y-%m-%d").to_string();
-							}
-							value = format!("'{}'", value);
-						} else {
-							value = "NULL".to_string();
-						}
-					}
-					ColumnType::DateTime => {
-						if !is_null(&value) {
-							let date = parse_datetime(&value);
-							if date.is_ok() {
-								value = date.unwrap().format("%Y-%m-%d %H:%M:%S").to_string();
-							}
-							value = format!("'{}'", value);
-						} else {
-							value = "NULL".to_string();
-						}
-					}
-					_ => {}
-				}
+				value = format_value(column.r#type.clone(), &value);
 				output_columns.push((name, value.to_string()));
 			}
 			let output: String = match statement.r#type {
@@ -131,16 +99,27 @@ pub fn generate_file(data: &str, statements: JsValue, corrections: JsValue) -> J
 						.map(|(c, v)| format!("{} = {}", c, v))
 						.collect::<Vec<String>>()
 						.join(", ");
-					let where_column_id = statement.r#where.value.unwrap();
-					let mut column_value = record[where_column_id].to_string();
-					if let Some(correction) = corrections.value.iter().find(|c| {
-						c.column_id == where_column_id
-							&& c.statement_id == statement.id
-							&& c.rows.iter().any(|&r| r == index)
-					}) {
-						column_value = correction.error_text.clone();
+
+					let mut where_clause = String::new();
+
+					for (pos, condition) in statement.where_selections.iter().enumerate() {
+						let where_column_id = condition.value.unwrap();
+						let mut column_value = record[where_column_id].to_string();
+
+						if let Some(correction) = corrections.value.iter().find(|c| {
+							c.column_id == where_column_id
+								&& c.statement_id == statement.id
+								&& c.rows.iter().any(|&r| r == index)
+						}) {
+							column_value = correction.error_text.clone();
+						}
+						column_value = format_value(condition.r#type.clone().unwrap(), &mut column_value);
+
+						let condition_text = if pos == 0 { "" } else { "AND "};
+
+						where_clause = format!("{} {} {} = {}", where_clause, condition_text, condition.key, column_value);
 					}
-					let where_clause = format!("{} = {}", statement.r#where.key, column_value);
+
 					format!(
 						"UPDATE {} SET {} WHERE {};",
 						statement.table, sets, where_clause
@@ -177,4 +156,44 @@ fn parse_datetime(value: &str) -> Result<NaiveDateTime, String> {
 fn is_null(value: &str) -> bool {
 	let value = value.trim();
 	value.to_lowercase() == "null"
+}
+
+
+fn format_value(column_type: ColumnType, value: &str) -> String{
+	let mut new_value = value.to_string(); 
+	match column_type {
+		ColumnType::VarChar => {
+			if !is_null(&value) {
+				new_value = str::replace(&value, "'", "''");
+				new_value = format!("'{}'", new_value);
+			} else {
+				new_value = "NULL".to_string();
+			}
+		}
+		ColumnType::Date => {
+			if !is_null(&value) {
+				let date = parse_datetime(&value);
+				if date.is_ok() {
+					new_value = date.unwrap().format("%Y-%m-%d").to_string();
+				}
+				new_value = format!("'{}'", new_value);
+			} else {
+				new_value = "NULL".to_string();
+			}
+		}
+		ColumnType::DateTime => {
+			if !is_null(&value) {
+				let date = parse_datetime(&value);
+				if date.is_ok() {
+					new_value = date.unwrap().format("%Y-%m-%d %H:%M:%S").to_string();
+				}
+				new_value = format!("'{}'", new_value);
+			} else {
+				new_value = "NULL".to_string();
+			}
+		}
+		_ => {}
+	}
+
+	new_value
 }

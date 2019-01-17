@@ -31,8 +31,7 @@
 						<input type="checkbox" id="checkbox" v-model="column.use_source"/>
 					</div>
 					<input v-model="column.name" class="column-input"/>
-					<button id="small-column" class="remove-button" v-on:click="remove({index, index2})"><i class="fa fa-trash"></i>{{index2}}</button>
-					{{index}},{{index2}}
+					<button id="small-column" class="remove-button" v-on:click="remove({index, index2})"><i class="fa fa-trash"></i></button>
 				</div>
 				<button class="columns-button" v-on:click="add(index)">Add Column <i class="fa fa-plus add-icon"></i></button>
 				<table class="where-clause" v-if="statement.type === 'Update'">
@@ -45,20 +44,21 @@
 							<th>Type</th>
 						</tr>	
 					</thead>
-					<tbody>
-						<tr>
-							<td class="where-text">WHERE</td>
+					<tbody >
+						<tr v-for="(where, whereindex) in statement.where_selections" :key="whereindex">
+							<td class="where-text" v-if="whereindex === 0">WHERE</td>
+							<td class="where-text" v-if="whereindex != 0">AND</td>
 							<td>
-								<input v-model="statement.where.key" class="column-input"/>
+								<input v-model="where.key" class="column-input"/>
 							</td>
 							<td class="equals">=</td>
 							<td>
-								<select v-model="statement.where.value" class="column-select">
+								<select v-model="where.value" class="column-select">
 									<option v-for="(option, index4) in columns" :key="index4" :value="option.index">{{option.name}}</option>
 								</select>
 							</td>
 							<td>
-								<select v-model="statement.where.type" class="column-select">
+								<select v-model="where.type" class="column-select">
 									<option>Int</option>
 									<option>Float</option>
 									<option>Date</option>
@@ -66,9 +66,13 @@
 									<option>VarChar</option>
 								</select>
 							</td>
+							<td>
+								<button id="small-column" class="remove-button" v-on:click="remove_where({index, whereindex})"><i class="fa fa-trash"></i></button>
+							</td>
 						</tr>	
 					</tbody>
 				</table>
+				<button class="columns-button" v-on:click="add_where(index)">Add Condition <i class="fa fa-plus add-icon"></i></button>
 			</div> 
 		</div>	
 		<button class="columns-button" v-on:click="done" v-if="columns_complete(statements)">Done <i class="fa fa-check add-icon"></i></button>
@@ -85,6 +89,8 @@ export default {
 			'ADD_COLUMN',
 			'DONE_ADDING_COLUMNS',
 			'REMOVE_COLUMN',
+			'ADD_WHERE',
+			'REMOVE_WHERE',
 		]),
 		add: function (index) {
 			this.ADD_COLUMN(index);
@@ -100,7 +106,7 @@ export default {
 					return false;
 				}
 
-				if (statement.type === 'Update' && (!statement.where.key || statement.where.value == undefined || statement.where.type == undefined )) {
+				if (statement.type === 'Update' && statement.where_selections.some(w => (!w.key || w.value == undefined || w.type == undefined ))) {
 					return false;
 				}
 
@@ -117,6 +123,12 @@ export default {
 		remove: function(arg) {
 			this.REMOVE_COLUMN(arg);
 		},
+		remove_where: function(arg) {
+			this.REMOVE_WHERE(arg);
+		},
+		add_where: function(index) {
+			this.ADD_WHERE(index);
+		}
 		// other methods
 	},
 	computed: {

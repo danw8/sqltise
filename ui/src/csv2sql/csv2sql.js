@@ -1,4 +1,4 @@
-/* tslint:disable *//* eslint-disable */
+/* tslint:disable */ /* eslint-disable */
 import * as wasm from './csv2sql_bg';
 
 const lTextDecoder = typeof TextDecoder === 'undefined' ? require('util').TextDecoder : TextDecoder;
@@ -300,7 +300,7 @@ export function __wbg_forEach_7796ea23499aa552(arg0, arg1, arg2) {
         }
 
     };
-    cbarg1.f = wasm.__wbg_function_table.get(142);
+    cbarg1.f = wasm.__wbg_function_table.get(144);
     cbarg1.a = arg1;
     cbarg1.b = arg2;
     try {
@@ -370,7 +370,7 @@ export function __wbg_new_bdd94b8735e4f66d(arg0, arg1) {
         }
 
     };
-    cbarg0.f = wasm.__wbg_function_table.get(135);
+    cbarg0.f = wasm.__wbg_function_table.get(137);
     cbarg0.a = arg0;
     cbarg0.b = arg1;
     try {
@@ -505,9 +505,9 @@ export function __wbindgen_jsval_eq(a, b) {
     return getObject(a) === getObject(b) ? 1 : 0;
 }
 
-export function __wbindgen_closure_wrapper2941(a, b, _ignored) {
-    const f = wasm.__wbg_function_table.get(113);
-    const d = wasm.__wbg_function_table.get(114);
+export function __wbindgen_closure_wrapper3015(a, b, _ignored) {
+    const f = wasm.__wbg_function_table.get(115);
+    const d = wasm.__wbg_function_table.get(116);
     const cb = function(arg0) {
         this.cnt++;
         let a = this.a;

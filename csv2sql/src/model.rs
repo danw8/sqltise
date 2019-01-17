@@ -21,7 +21,7 @@ pub struct StatementSelection {
 	pub name: String,
 	pub table: String,
 	pub column_selections: ColumnSelections,
-	pub r#where: WhereClause,
+	pub where_selections: Vec<WhereClause>,
 }
 
 #[derive(Serialize, Deserialize)]

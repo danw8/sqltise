@@ -60,9 +60,16 @@ var store = new Vuex.Store({
 				 type: null,
 				 name: 'New Statement',
 				 table: '',
-				 where: {key: '', value: null, type: null}
+				 where_selections: [{key: '', value: null, type: null}]
 			};
 			state.statements.value.push(new_statement);
+		},
+		ADD_WHERE: (state, index) => {
+			state.statements.value[index].where_selections.push({key: '', value: null, type: null});
+		},
+		REMOVE_WHERE: (state, indexes) => {
+			console.log('indexes: ', indexes);
+			state.statements.value[indexes.index].where_selections.splice(indexes.whereindex, 1);
 		},
 		REMOVE_STATEMENT: (state, index) => {
 			state.statements.value.splice(index, 1);
