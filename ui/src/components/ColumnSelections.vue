@@ -31,7 +31,8 @@
 						<input type="checkbox" id="checkbox" v-model="column.use_source"/>
 					</div>
 					<input v-model="column.name" class="column-input"/>
-					<button id="small-column" class="remove-button" v-on:click="remove(index, index2)"><i class="fa fa-trash"></i></button>
+					<button id="small-column" class="remove-button" v-on:click="remove({index, index2})"><i class="fa fa-trash"></i>{{index2}}</button>
+					{{index}},{{index2}}
 				</div>
 				<button class="columns-button" v-on:click="add(index)">Add Column <i class="fa fa-plus add-icon"></i></button>
 				<table class="where-clause" v-if="statement.type === 'Update'">
@@ -113,8 +114,8 @@ export default {
 			});
 			return completed;
 		},
-		remove: function(index, index2) {
-			this.REMOVE_COLUMN(index, index2);
+		remove: function(arg) {
+			this.REMOVE_COLUMN(arg);
 		},
 		// other methods
 	},

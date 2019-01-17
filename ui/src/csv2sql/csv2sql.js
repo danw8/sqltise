@@ -467,6 +467,10 @@ export function __wbindgen_object_clone_ref(idx) {
 
 export function __wbindgen_object_drop_ref(i) { dropObject(i); }
 
+export function __wbindgen_string_new(p, l) {
+    return addHeapObject(getStringFromWasm(p, l));
+}
+
 export function __wbindgen_number_new(i) { return addHeapObject(i); }
 
 export function __wbindgen_string_get(i, len_ptr) {
@@ -501,7 +505,7 @@ export function __wbindgen_jsval_eq(a, b) {
     return getObject(a) === getObject(b) ? 1 : 0;
 }
 
-export function __wbindgen_closure_wrapper2936(a, b, _ignored) {
+export function __wbindgen_closure_wrapper2941(a, b, _ignored) {
     const f = wasm.__wbg_function_table.get(113);
     const d = wasm.__wbg_function_table.get(114);
     const cb = function(arg0) {

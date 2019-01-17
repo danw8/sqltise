@@ -17,30 +17,13 @@ var default_state = function() {
 			columnSelectionsDone: false,
 			nextid: 0,
 			value: [
-				// {
-				// 	// column_selections: {
-				// 	// 	value: [],
-				// 	// 	done: false,
-				// 	// },
-				// 	// id: id,
-				// 	// type: statementType,
-				// 	// name: 'New Statement',
-				// 	// table: '' ,
-				// 	// whereClause: whereClause
-				// }
 			],
-			// column_selections: {
-			// 	value: [],
-			// 	done: false,
-			// },
 		},
 		error_solutions: [],
 		errors: [],
 		downloads: [],
 	}
 };
-
-//var state_stack = [];
 
 var store = new Vuex.Store({
 	state: Object.assign({}, default_state()),
@@ -97,8 +80,8 @@ var store = new Vuex.Store({
 				state.errors = result.value;
 			}).catch(console.error)
 		},
-		REMOVE_COLUMN: (state, statementIndex, columnSelectIndex) => {
-			state.statements.value[statementIndex].column_selections.value.splice(columnSelectIndex, 1);
+		REMOVE_COLUMN: (state, indexes) => {
+			state.statements.value[indexes.index].column_selections.value.splice(indexes.index2, 1);
 		},
 		SOLVE_ERROR: (state, index) => {
 
