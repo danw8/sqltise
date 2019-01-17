@@ -72,7 +72,7 @@
 						</tr>	
 					</tbody>
 				</table>
-				<button class="columns-button" v-on:click="add_where(index)">Add Condition <i class="fa fa-plus add-icon"></i></button>
+				<button class="columns-button" v-on:click="add_where(index)" v-if="statement.type === 'Update'">Add Condition <i class="fa fa-plus add-icon"></i></button>
 			</div> 
 		</div>	
 		<button class="columns-button" v-on:click="done" v-if="columns_complete(statements)">Done <i class="fa fa-check add-icon"></i></button>
