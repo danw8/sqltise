@@ -116,8 +116,9 @@ pub fn generate_file(data: &str, statements: JsValue, corrections: JsValue) -> J
 						column_value = format_value(condition.r#type.clone().unwrap(), &mut column_value);
 
 						let condition_text = if pos == 0 { "" } else { "AND "};
+						let compare_text = if column_value == "NULL" { "IS" } else { "="};
 
-						where_clause = format!("{} {} {} = {}", where_clause, condition_text, condition.key, column_value);
+						where_clause = format!("{} {} {} {} {}", where_clause, condition_text, condition.key, compare_text, column_value);
 					}
 
 					format!(
