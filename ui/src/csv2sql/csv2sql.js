@@ -1,4 +1,4 @@
-/* tslint:disable *//* eslint-disable */
+/* tslint:disable */
 import * as wasm from './csv2sql_bg';
 
 const lTextDecoder = typeof TextDecoder === 'undefined' ? require('util').TextDecoder : TextDecoder;
