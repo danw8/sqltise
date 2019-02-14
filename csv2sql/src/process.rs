@@ -84,7 +84,7 @@ fn process_record_for_statment(record: &StringRecord, index: usize,  statement: 
 				// Don't add errors for freetext it always is what the user typed in.
 			},
 			ColumnSource::CSV => {
-				let id = column.column;
+				let id = column.column.unwrap();
 				let value = &record[id];
 
 				if check_for_error(&column.r#type, value) {

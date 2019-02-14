@@ -187,7 +187,7 @@ fn get_insert_statement(values: &Vec<(String, String)>, statement: &StatementSel
 
 
 fn get_column_value(statement_id: usize, index: usize, column: &ColumnSelection, record: &StringRecord, corrections: &Vec<CsvError>, headers: &Vec<ColumnHeader> ) -> (String, String) {
-		let id = column.column;
+		let id = column.column.unwrap();
 		let mut value: String = record[id].to_string();
 
 		if let Some(correction) = corrections.iter().find(|c| {

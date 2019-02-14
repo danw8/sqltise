@@ -44,7 +44,7 @@ pub struct ColumnSelections {
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct ColumnSelection {
-	pub column: usize,
+	pub column: Option<usize>,
 	pub data: Option<String>,
 	pub name: Option<String>,
 	pub source: ColumnSource,

@@ -23,7 +23,7 @@
 						<option>FreeText</option>
 					</select>
 					<input v-if="!column.source" class="column-input" disabled/>
-					<input type="text" class="column-input" v-model="column.data" v-if="column.source == 'FreeText'"/>
+					<input type="text" class="column-input" v-model="column.data" v-show="column.source == 'FreeText'"/>
 					<select v-model="column.column" class="column-select" v-if="column.source == 'CSV'">
 						<option v-for="(option, index3) in columns" :key="index3" :value="option.index">{{option.name}}</option>
 					</select>

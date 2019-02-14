@@ -82,12 +82,22 @@ var store = new Vuex.Store({
 			state.statements.done = true;
 		},
 		ADD_COLUMN: (state, index) => {
-			state.statements.value[index].column_selections.value.push({source: null, data: null, column: null, name: null, type: null, use_source: false });
+			state.statements.value[index].column_selections.value.push({source: null, data: '', column: null, name: null, type: null, use_source: false });
 		},
 		DONE_ADDING_COLUMNS: (state) => {
 			state.statements.columnSelectionsDone = true;
 			csv2sql.then(m => {
+				// for (var statement in state.statements.value) {
+				// 	for (var column in statement.column_selections.value) {
+				// 		if (!column.hasOwnProperty('data')){
+				// 			column.data = null;
+				// 		}
+				// 	}
+				// }
 				let result = m.process_file(state.raw_csv, state.statements);
+				if (!result.value){
+					console.log('Error Processing File: ', result);
+				}
 				state.errors = result.value;
 			}).catch(console.error)
 		},
@@ -116,6 +126,9 @@ var store = new Vuex.Store({
 				.then(m => {
 					let result = m.generate_file(state.raw_csv, state.statements, { value: state.error_solutions }, state.onefile);
 
+					if (!typeof(result) == 'array'){
+						console.log('Error Generating File: ', result);
+					}
 					var i = 0;
 					for (i; i < result.length; i++) {
 						var data = result[i];
