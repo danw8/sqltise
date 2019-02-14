@@ -1,6 +1,6 @@
 //super::log;
 use super::model::{
-	ColumnType, CsvError, CsvErrors, StatementSelections, StatementType, StatementSelection,
+	ColumnType, CsvError, CsvErrors, StatementSelections, StatementType, StatementSelection, ColumnSource
 };
 use super::{DATETIME_FORMATS, DATE_FORMATS};
 use chrono::{NaiveDate, NaiveDateTime};
@@ -79,11 +79,18 @@ fn process_file_impl(data: &str, statements: StatementSelections) -> Result<Vec<
 
 fn process_record_for_statment(record: &StringRecord, index: usize,  statement: &StatementSelection, mut errors: &mut Vec<CsvError>){
 	for column in &statement.column_selections.value {
-		let id = column.column;
-		let value = &record[id];
+		match column.source {
+			ColumnSource::FreeText => {
+				// Don't add errors for freetext it always is what the user typed in.
+			},
+			ColumnSource::CSV => {
+				let id = column.column;
+				let value = &record[id];
 
-		if check_for_error(&column.r#type, value) {
-			add_error(&mut errors, value, statement.id, id, index, &column.r#type);
+				if check_for_error(&column.r#type, value) {
+					add_error(&mut errors, value, statement.id, id, index, &column.r#type);
+				}
+			}
 		}
 	}
 }
@@ -119,9 +126,9 @@ fn check_for_error(column_type: &ColumnType, value: &str) -> bool {
 		ColumnType::Date => check_date_errors(value.trim()),
 		ColumnType::DateTime => check_date_errors(value.trim()),
 		ColumnType::VarChar => check_varchar_errors(value.trim()),
+		ColumnType::PerFormatted => true,
 	}
 }
-
 
 fn check_int_errors(value: &str) -> bool {
 	let value = value.trim();

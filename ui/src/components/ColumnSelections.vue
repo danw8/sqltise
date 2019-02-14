@@ -10,14 +10,21 @@
 			<div v-if="statement.column_selections">
 				<h3>{{statement.name}} - ({{statement.table}})</h3>
 				<div class="columns-header" v-if="statement.column_selections && statement.column_selections.value.length > 0">
-					<div>Source Column</div>
+					<div>Source</div>
+					<div>Data</div>
 					<div>Type</div>
 					<div id="small-column">Use Source Name</div>
 					<div>Destination Column</div>
 					<div id="small-column">Delete</div>
 				</div>
 				<div class="columns" v-for="(column, index2) in statement.column_selections.value" :key="index2">
-					<select v-model="column.column" class="column-select">
+					<select v-model="column.source" class="column-select">
+						<option>CSV</option>
+						<option>FreeText</option>
+					</select>
+					<input v-if="!column.source" class="column-input" disabled/>
+					<input type="text" class="column-input" v-model="column.data" v-if="column.source == 'FreeText'"/>
+					<select v-model="column.column" class="column-select" v-if="column.source == 'CSV'">
 						<option v-for="(option, index3) in columns" :key="index3" :value="option.index">{{option.name}}</option>
 					</select>
 					<select v-model="column.type" class="column-select">
@@ -26,9 +33,11 @@
 						<option>Date</option>
 						<option>DateTime</option>
 						<option>VarChar</option>
+						<option>PerFormatted</option>
 					</select>
 					<div id="small-column" class="column-checkbox">
-						<input type="checkbox" id="checkbox" v-model="column.use_source"/>
+						<input type="checkbox" id="checkbox" v-model="column.use_source" v-if="column.source != 'CSV'" disabled/>
+						<input type="checkbox" id="checkbox" v-model="column.use_source" v-if="column.source == 'CSV'"/>
 					</div>
 					<input v-model="column.name" class="column-input"/>
 					<button id="small-column" class="remove-button" v-on:click="remove({index, index2})"><i class="fa fa-trash"></i></button>
@@ -111,7 +120,7 @@ export default {
 				}
 
 				completed =  columns.every((s) => {
-						return s.column != undefined && !!s.type && (!!s.name || s.use_source) && !(!!s.name && s.use_source)
+						return (s.column != undefined || s.source == 'FreeText') && !!s.type && (!!s.name || s.use_source) && !(!!s.name && s.use_source)
 					});	
 
 				if (!completed)	{

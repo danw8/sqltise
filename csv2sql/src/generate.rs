@@ -1,28 +1,48 @@
 use super::log;
 use super::model::{
-	ColumnHeader, ColumnType, CsvErrors, ParseError, StatementSelections, StatementType,
+	ColumnHeader, ColumnType, CsvErrors, CsvError, StatementSelections, StatementSelection, StatementType, ColumnSelection, ColumnSource,
 };
+
+use csv::StringRecord;
 use super::{DATETIME_FORMATS, DATE_FORMATS};
 use chrono::{NaiveDate, NaiveDateTime};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-pub fn generate_file(data: &str, statements: JsValue, corrections: JsValue) -> JsValue {
-	let statements: StatementSelections = statements.into_serde().unwrap();
-	let corrections: CsvErrors = corrections
-		.into_serde()
-		.unwrap_or(CsvErrors { value: Vec::new() });
+pub fn generate_file(data: &str, statements: JsValue, corrections: JsValue, combine: bool) -> JsValue {
+	
+	let combine_text = format!("combine: {}", combine);
+	log(&combine_text);
 
-	let mut reader = csv::ReaderBuilder::new()
-		.has_headers(true)
-		.from_reader(data.as_bytes());
+	let statements: StatementSelections = match statements.into_serde() {
+		Ok(s) => s,
+		Err(_e) => {
+			return JsValue::from_str("Couldn't deserialize the statements, did the model change?");
+		}
+	};
 
+	let corrections: CsvErrors = match corrections.into_serde() {
+		Ok(c) => c,
+		Err(_) => {
+			return JsValue::from_str("Couldn't deserialize the Errors, did the model change?");
+		}
+	};
+
+	let results = match generate_statements(data, statements.value, corrections.value, combine) {
+		Ok(sql) => sql,
+		Err(e) => return JsValue::from_str(&e),
+	};
+
+	return JsValue::from_serde(&results).unwrap();
+}
+
+fn get_headers(reader: &mut csv::Reader<&[u8]>) -> Result<Vec<ColumnHeader>,String>  {
 	let mut headers = Vec::new();
 
 	let header_value = match reader.headers() {
 		Ok(h) => h,
 		Err(_e) => {
-			return JsValue::NULL;
+			return Err("Couldn't read the headers".to_string());
 		}
 	};
 
@@ -34,104 +54,158 @@ pub fn generate_file(data: &str, statements: JsValue, corrections: JsValue) -> J
 		headers.push(header);
 	}
 
-	let mut results: Vec<String> = Vec::new();
+	Ok(headers)
+}
 
-	for statement in statements.value {
-		let mut statement_lines: Vec<String> = Vec::new();
+fn generate_statements(data: &str, statements: Vec<StatementSelection>, corrections: Vec<CsvError>, combine: bool) -> Result<Vec<String>, String> {
+	let mut reader = csv::ReaderBuilder::new()
+		.has_headers(true)
+		.from_reader(data.as_bytes());
 
-		for (index, record) in reader.records().enumerate() {
-			let record = match record {
-				Ok(r) => r,
-				Err(e) => {
-					let error = &format!("{{ error: 'Not a proper csv file', kind: {} }}", e);
-					let json: ParseError = serde_json::from_str(error).unwrap();
-					return JsValue::from_serde(&json).unwrap();
-				}
-			};
+	let headers = get_headers(&mut reader)?;
 
-			if record.iter().all(|r| r.trim().is_empty()) {
-				continue;
-			}
+	let mut sql_by_rows = Vec::<(usize, String)>::new();
 
-			let mut output_columns: Vec<(String, String)> = Vec::new();
+	for(index, row) in reader.records().enumerate() {
 
-			for ref column in &statement.column_selections.value {
-				let id = column.column;
-				let mut value: String = record[id].to_string();
+		let record = row
+			.map_err(|e| 
+			format!("The .csv file could not be parsed. Internal Error: {}", e ))?;
 
-				if let Some(correction) = corrections.value.iter().find(|c| {
-					c.column_id == id
-						&& c.statement_id == statement.id
-						&& c.rows.iter().any(|&r| r == index)
-				}) {
-					value = correction.error_text.clone();
-				}
-
-				let name = match column.use_source {
-					true => headers.iter().find(|h| h.index == id).unwrap().name.clone(),
-					false => column.name.clone().unwrap(),
-				};
-
-				// Format the values here to meet the requirement of the type
-				value = format_value(column.r#type.clone(), &value);
-				output_columns.push((name, value.to_string()));
-			}
-			let output: String = match statement.r#type {
-				StatementType::Insert => {
-					let column_names = output_columns
-						.iter()
-						.map(|(c, _)| c.clone())
-						.collect::<Vec<String>>()
-						.join(", ");
-					let values = output_columns
-						.iter()
-						.map(|(_, v)| v.clone())
-						.collect::<Vec<String>>()
-						.join(", ");
-					format!(
-						"INSERT INTO {} ({}) VALUES ({});",
-						statement.table, column_names, values
-					)
-				}
-				StatementType::Update => {
-					let sets = output_columns
-						.iter()
-						.map(|(c, v)| format!("{} = {}", c, v))
-						.collect::<Vec<String>>()
-						.join(", ");
-
-					let mut where_clause = String::new();
-
-					for (pos, condition) in statement.where_selections.iter().enumerate() {
-						let where_column_id = condition.value.unwrap();
-						let mut column_value = record[where_column_id].to_string();
-
-						if let Some(correction) = corrections.value.iter().find(|c| {
-							c.column_id == where_column_id
-								&& c.statement_id == statement.id
-								&& c.rows.iter().any(|&r| r == index)
-						}) {
-							column_value = correction.error_text.clone();
-						}
-						column_value = format_value(condition.r#type.clone().unwrap(), &mut column_value);
-
-						let condition_text = if pos == 0 { "" } else { "AND "};
-						let compare_text = if column_value == "NULL" { "IS" } else { "="};
-
-						where_clause = format!("{} {} {} {} {}", where_clause, condition_text, condition.key, compare_text, column_value);
-					}
-
-					format!(
-						"UPDATE {} SET {} WHERE {};",
-						statement.table, sets, where_clause
-					)
-				}
-			};
-			statement_lines.push(output);
+		if record.iter().all(|r| r.trim().is_empty()) {
+			continue;
 		}
-		results.push(statement_lines.join("\n"));
+
+		for statement in &statements {
+			let sql = get_row_sql(statement, &record, index,  &corrections, &headers);
+			sql_by_rows.push((statement.id, sql));
+		}
 	}
-	return JsValue::from_serde(&results).unwrap();
+
+	let mut files = Vec::new();
+
+	if combine {
+		let num_statements = statements.len();
+		let rows = sql_by_rows.chunks(num_statements);
+		let output = rows
+			.filter(|a| a.len() != 0)
+			.map(|row| row.iter().map(|(_, v)| v.to_string()).collect::<Vec<String>>().join("\n"))
+			.collect::<Vec<String>>()
+			.join("\n GO \n");
+		files.push(output);
+	} else {
+		for statement in &statements {
+			let output = sql_by_rows.iter()
+				.filter(|(k, _)| k == &statement.id)
+				.map(|(_, v)| v.to_string())
+				.collect::<Vec<String>>()
+				.join("\n");
+			files.push(output);
+		}
+	};
+
+	Ok(files)
+}
+
+fn get_row_sql(statement: &StatementSelection, record: &StringRecord, index: usize, corrections: &Vec<CsvError>, headers: &Vec<ColumnHeader>) -> String {
+	let mut outputs = Vec::new();
+	for column in &statement.column_selections.value {
+		match column.source {
+			ColumnSource::FreeText => {
+				let name: String = column.name.clone().unwrap();
+				let mut value: String = column.data.clone().unwrap();
+				value = format_value(column.r#type.clone(), &value);
+				outputs.push((name, value));
+			},
+			ColumnSource::CSV => {
+				outputs.push(get_column_value(statement.id, index, column, record, corrections, headers));
+			}
+		}
+
+	}
+
+	match statement.r#type {
+		StatementType::Insert => {
+			get_insert_statement(&outputs, statement)
+		},
+		StatementType::Update => {
+			get_update_statement(outputs, statement, record, index, corrections)
+		}
+	}
+}
+
+fn get_update_statement(values: Vec<(String, String)>, statement: &StatementSelection, record: &StringRecord, index: usize, corrections: &Vec<CsvError>) -> String{
+	let sets = values
+		.iter()
+		.map(|(c, v)| format!("{} = {}", c, v))
+		.collect::<Vec<String>>()
+		.join(", ");
+
+	let mut where_clause = String::new();
+
+	for (pos, condition) in statement.where_selections.iter().enumerate() {
+		let where_column_id = condition.value.unwrap();
+		let mut column_value = record[where_column_id].to_string();
+
+		if let Some(correction) = corrections.iter().find(|c| {
+			c.column_id == where_column_id
+				&& c.statement_id == statement.id
+				&& c.rows.iter().any(|&r| r == index)
+		}) {
+			column_value = correction.error_text.clone();
+		}
+		column_value = format_value(condition.r#type.clone().unwrap(), &mut column_value);
+
+		let condition_text = if pos == 0 { "" } else { "AND "};
+		let compare_text = if column_value == "NULL" { "IS" } else { "="};
+
+		where_clause = format!("{} {} {} {} {}", where_clause, condition_text, condition.key, compare_text, column_value);
+	}
+
+	format!(
+		"UPDATE {} SET {} WHERE {};",
+		statement.table, sets, where_clause
+	)
+}
+
+fn get_insert_statement(values: &Vec<(String, String)>, statement: &StatementSelection) -> String{
+	let column_names = values
+		.iter()
+		.map(|(c, _)| c.clone())
+		.collect::<Vec<String>>()
+		.join(", ");
+	let values = values
+		.iter()
+		.map(|(_, v)| v.clone())
+		.collect::<Vec<String>>()
+		.join(", ");
+	format!(
+		"INSERT INTO {} ({}) VALUES ({});",
+		statement.table, column_names, values
+	)
+}
+
+
+fn get_column_value(statement_id: usize, index: usize, column: &ColumnSelection, record: &StringRecord, corrections: &Vec<CsvError>, headers: &Vec<ColumnHeader> ) -> (String, String) {
+		let id = column.column;
+		let mut value: String = record[id].to_string();
+
+		if let Some(correction) = corrections.iter().find(|c| {
+			c.column_id == id
+				&& c.statement_id == statement_id
+				&& c.rows.iter().any(|&r| r == index)
+		}) {
+			value = correction.error_text.clone();
+		}
+
+		let name = match column.use_source {
+			true => headers.iter().find(|h| h.index == id).unwrap().name.clone(),
+			false => column.name.clone().unwrap(),
+		};
+
+		value = format_value(column.r#type.clone(), &value);
+		(name, value.to_string())
+
 }
 
 fn parse_datetime(value: &str) -> Result<NaiveDateTime, String> {

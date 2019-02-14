@@ -19,8 +19,12 @@
             <input v-model="statement.table" class="statement-input"/>
             <button class="remove-button" v-on:click="remove(index)"><i class="fa fa-trash"></i></button>
         </div>
+        <input type="checkbox" id="single-file" :checked="onefile" v-on:change="check_one_file">
+        <label for="single-file">Generate all statements to a single file</label>
+        <div class="action-buttons">
         <button class="statements-button" v-on:click="add">Add Statement<i class="fa fa-plus add-icon"></i></button>
         <button class="statements-button" v-on:click="done" v-if="statements_complete(statements.value)">Done<i class="fa fa-check add-icon"></i></button>
+        </div>
     </div>
 </template>
 
@@ -34,6 +38,7 @@ export default {
             "ADD_STATEMENT",
             "REMOVE_STATEMENT",
             "DONE_ADDING_STATEMENTS",
+            "CHANGE_ONE_FILE_SELECTION",
         ]),
         add: function () {
             this.ADD_STATEMENT();
@@ -49,12 +54,16 @@ export default {
                 return false;
             }
             return statements.every((s) => !!s.name && !!s.table && !!s.type);
+        },
+        check_one_file: function() {
+            this.CHANGE_ONE_FILE_SELECTION(!this.onefile);
         }
         // other methods
     },
     computed: {
 		...mapState([
-            "statements"
+            "statements",
+            "onefile",
         ]),
 		// other properties
 	},
@@ -130,5 +139,9 @@ export default {
 .remove-button:hover {
     color: #A8383B;
     cursor: pointer;
+}
+
+.action-buttons{
+    margin-top: 20px;
 }
 </style>

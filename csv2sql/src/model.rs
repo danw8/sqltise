@@ -45,9 +45,17 @@ pub struct ColumnSelections {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct ColumnSelection {
 	pub column: usize,
+	pub data: Option<String>,
 	pub name: Option<String>,
+	pub source: ColumnSource,
 	pub r#type: ColumnType,
 	pub use_source: bool,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub enum ColumnSource {
+	CSV,
+	FreeText,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -57,6 +65,7 @@ pub enum ColumnType {
 	Date,
 	DateTime,
 	VarChar,
+	PerFormatted,
 }
 
 #[derive(Serialize, Deserialize)]

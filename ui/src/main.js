@@ -19,6 +19,7 @@ var default_state = function() {
 			value: [
 			],
 		},
+		onefile: true,
 		error_solutions: [],
 		errors: [],
 		downloads: [],
@@ -74,11 +75,14 @@ var store = new Vuex.Store({
 		REMOVE_STATEMENT: (state, index) => {
 			state.statements.value.splice(index, 1);
 		},
+		CHANGE_ONE_FILE_SELECTION: (state, checked) => {
+			state.onefile =	checked;
+		},
 		DONE_ADDING_STATEMENTS: (state) => {
 			state.statements.done = true;
 		},
 		ADD_COLUMN: (state, index) => {
-			state.statements.value[index].column_selections.value.push({column: null, name: null, type: null, use_source: false });
+			state.statements.value[index].column_selections.value.push({source: null, data: null, column: null, name: null, type: null, use_source: false });
 		},
 		DONE_ADDING_COLUMNS: (state) => {
 			state.statements.columnSelectionsDone = true;
@@ -110,7 +114,7 @@ var store = new Vuex.Store({
 		{
 			csv2sql
 				.then(m => {
-					let result = m.generate_file(state.raw_csv, state.statements, { value: state.error_solutions });
+					let result = m.generate_file(state.raw_csv, state.statements, { value: state.error_solutions }, state.onefile);
 
 					var i = 0;
 					for (i; i < result.length; i++) {
