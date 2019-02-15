@@ -37,7 +37,7 @@
 							<option>Date</option>
 							<option>DateTime</option>
 							<option>VarChar</option>
-							<option>PerFormatted</option>
+							<option>PreFormatted</option>
 						</select>
 						<div id="small-column" class="column-checkbox">
 							<input type="checkbox" id="checkbox" v-model="column.use_source" v-if="column.source != 'CSV'" disabled/>

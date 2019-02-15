@@ -128,7 +128,7 @@ fn check_for_error(column_type: &ColumnType, value: &str) -> bool {
 		ColumnType::Date => check_date_errors(value.trim()),
 		ColumnType::DateTime => check_date_errors(value.trim()),
 		ColumnType::VarChar => check_varchar_errors(value.trim()),
-		ColumnType::PerFormatted => true,
+		ColumnType::PreFormatted => true,
 	}
 }
 

@@ -67,7 +67,7 @@ pub enum ColumnType {
 	Date,
 	DateTime,
 	VarChar,
-	PerFormatted,
+	PreFormatted,
 }
 
 #[derive(Serialize, Deserialize)]
