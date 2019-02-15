@@ -116,7 +116,6 @@ export default {
 			let completed;
 			statements.value.forEach(statement => {
 				if (statement.type == 'Custom'){
-					console.log("hmmm");
 					completed = statement.custom.length > 0; 
 				}
 
