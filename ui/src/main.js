@@ -51,16 +51,13 @@ var store = new Vuex.Store({
 			var id = state.statements.nextid++;
 			var new_statement = {
 				 column_selections: {
-					 value: [{
-						 column: null,
-						 name: null,
-						 type: null,
-						 use_source: false }],
+					 value: [],
 					done: false },
 				 id: id,
 				 type: null,
 				 name: 'New Statement',
 				 table: '',
+				 custom: '',
 				 where_selections: [{key: '', value: null, type: null}]
 			};
 			state.statements.value.push(new_statement);
@@ -79,6 +76,11 @@ var store = new Vuex.Store({
 			state.onefile =	checked;
 		},
 		DONE_ADDING_STATEMENTS: (state) => {
+			for (var statement in state.statements.value) {
+				if (statement.type == 'Custom') {
+					statement.column_selections = null;
+				}
+			}
 			state.statements.done = true;
 		},
 		ADD_COLUMN: (state, index) => {
@@ -87,13 +89,6 @@ var store = new Vuex.Store({
 		DONE_ADDING_COLUMNS: (state) => {
 			state.statements.columnSelectionsDone = true;
 			csv2sql.then(m => {
-				// for (var statement in state.statements.value) {
-				// 	for (var column in statement.column_selections.value) {
-				// 		if (!column.hasOwnProperty('data')){
-				// 			column.data = null;
-				// 		}
-				// 	}
-				// }
 				let result = m.process_file(state.raw_csv, state.statements);
 				if (!result.value){
 					console.log('Error Processing File: ', result);

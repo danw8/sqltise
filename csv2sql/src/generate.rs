@@ -109,20 +109,23 @@ fn generate_statements(data: &str, statements: Vec<StatementSelection>, correcti
 
 fn get_row_sql(statement: &StatementSelection, record: &StringRecord, index: usize, corrections: &Vec<CsvError>, headers: &Vec<ColumnHeader>) -> String {
 	let mut outputs = Vec::new();
-	for column in &statement.column_selections.value {
-		match column.source {
-			ColumnSource::FreeText => {
-				let name: String = column.name.clone().unwrap();
-				let mut value: String = column.data.clone().unwrap();
-				value = format_value(column.r#type.clone(), &value);
-				outputs.push((name, value));
-			},
-			ColumnSource::CSV => {
-				outputs.push(get_column_value(statement.id, index, column, record, corrections, headers));
+
+	if let Some(selections) = &statement.column_selections {
+		for column in &selections.value {
+			match column.source {
+				ColumnSource::FreeText => {
+					let name: String = column.name.clone().unwrap();
+					let mut value: String = column.data.clone().unwrap();
+					value = format_value(column.r#type.clone(), &value);
+					outputs.push((name, value));
+				},
+				ColumnSource::CSV => {
+					outputs.push(get_column_value(statement.id, index, column, record, corrections, headers));
+				}
 			}
 		}
-
 	}
+
 
 	match statement.r#type {
 		StatementType::Insert => {
@@ -130,6 +133,9 @@ fn get_row_sql(statement: &StatementSelection, record: &StringRecord, index: usi
 		},
 		StatementType::Update => {
 			get_update_statement(outputs, statement, record, index, corrections)
+		},
+		StatementType::Custom => {
+			statement.custom.clone().unwrap()
 		}
 	}
 }

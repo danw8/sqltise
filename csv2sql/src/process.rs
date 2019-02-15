@@ -78,17 +78,19 @@ fn process_file_impl(data: &str, statements: StatementSelections) -> Result<Vec<
 
 
 fn process_record_for_statment(record: &StringRecord, index: usize,  statement: &StatementSelection, mut errors: &mut Vec<CsvError>){
-	for column in &statement.column_selections.value {
-		match column.source {
-			ColumnSource::FreeText => {
-				// Don't add errors for freetext it always is what the user typed in.
-			},
-			ColumnSource::CSV => {
-				let id = column.column.unwrap();
-				let value = &record[id];
+	if let Some(selections) = &statement.column_selections {
+		for column in &selections.value {
+			match column.source {
+				ColumnSource::FreeText => {
+					// Don't add errors for freetext it always is what the user typed in.
+				},
+				ColumnSource::CSV => {
+					let id = column.column.unwrap();
+					let value = &record[id];
 
-				if check_for_error(&column.r#type, value) {
-					add_error(&mut errors, value, statement.id, id, index, &column.r#type);
+					if check_for_error(&column.r#type, value) {
+						add_error(&mut errors, value, statement.id, id, index, &column.r#type);
+					}
 				}
 			}
 		}

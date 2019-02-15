@@ -14,6 +14,7 @@
             <select v-model="statement.type" class="statement-select">
                 <option>Insert</option>
                 <option>Update</option>
+                <option>Custom</option>
             </select>
             <input v-model="statement.name" class="statement-input"/>
             <input v-model="statement.table" class="statement-input"/>

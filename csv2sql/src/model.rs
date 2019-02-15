@@ -20,7 +20,8 @@ pub struct StatementSelection {
 	pub r#type: StatementType,
 	pub name: String,
 	pub table: String,
-	pub column_selections: ColumnSelections,
+	pub custom: Option<String>,
+	pub column_selections: Option<ColumnSelections>,
 	pub where_selections: Vec<WhereClause>,
 }
 
@@ -35,6 +36,7 @@ pub struct WhereClause {
 pub enum StatementType {
 	Insert,
 	Update,
+	Custom,
 }
 
 #[derive(Serialize, Deserialize)]
