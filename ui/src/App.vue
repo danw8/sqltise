@@ -82,11 +82,6 @@ export default {
 </script>
 
 <style>
-/* body {
-	display: inline-block;
-	vertical-align: middle;
-	max-width: 38rem;
-}; */
 
 #app {
 	font-family: 'Avenir', Helvetica, Arial, sans-serif;
@@ -94,13 +89,6 @@ export default {
 	-moz-osx-font-smoothing: grayscale;
 	color: #2c3e50;
 	padding: 10px 50px;
-
-	/* position: fixed;
-	top: 50%;
-	left: 50%;
-	-webkit-transform: translate(-50%, -50%);
-	transform: translate(-50%, -50%);
-	text-align: center; */
 }
 
 #app > h1 {
@@ -110,18 +98,11 @@ export default {
 .transition-wrapper {
 	display: flex;
 	flex-direction: row;
-
-	/* justify-content: center;
-	align-items: center; */
 }
 
 .zoom-enter-active {
 	animation: slideInLeft .5s;
 }
-
-/* .zoom-leave-active {
-	animation: slideOutLeft 0s;
-} */
 
 .generate-button{
 	background-color: #277554;

@@ -129,7 +129,33 @@ export default {
 				}
 
 				completed =  columns.every((s) => {
-						return (s.column != undefined || s.source == 'FreeText') && !!s.type && (!!s.name || s.use_source) && !(!!s.name && s.use_source)
+						var col_valid = true;
+						// the column must be from the csv file or have a freetext source
+						if (s.column == undefined && s.source !== 'FreeText') {
+							col_valid = false;
+						}
+
+						// always need to use the source name or provide a name
+						if (!s.use_source && !s.name) {
+							col_valid = false;
+						}
+
+						// FreeText always needs a name
+						if (s.source === 'FreeText' && !s.name) {
+							col_valid = false;
+						}
+
+						// if not freetext only have a name if you are not useing the source
+						if (s.source !== 'FreeText' && !!s.name && s.use_source){
+							col_valid = false;
+						}
+
+						// doesn't have a column type
+						if (!s.type) {
+							col_valid = false;
+						}
+
+						return col_valid;
 					});	
 
 				if (!completed)	{

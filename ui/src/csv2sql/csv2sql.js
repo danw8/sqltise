@@ -176,7 +176,7 @@ export function __wbg_forEach_7796ea23499aa552(arg0, arg1, arg2) {
         }
 
     };
-    cbarg1.f = wasm.__wbg_function_table.get(162);
+    cbarg1.f = wasm.__wbg_function_table.get(189);
     cbarg1.a = arg1;
     cbarg1.b = arg2;
     try {
@@ -254,7 +254,7 @@ export function __wbg_new_bdd94b8735e4f66d(arg0, arg1) {
         }
 
     };
-    cbarg0.f = wasm.__wbg_function_table.get(170);
+    cbarg0.f = wasm.__wbg_function_table.get(197);
     cbarg0.a = arg0;
     cbarg0.b = arg1;
     try {
@@ -506,9 +506,9 @@ export function __wbindgen_jsval_eq(a, b) {
     return getObject(a) === getObject(b) ? 1 : 0;
 }
 
-export function __wbindgen_closure_wrapper732(a, b, _ignored) {
-    const f = wasm.__wbg_function_table.get(174);
-    const d = wasm.__wbg_function_table.get(175);
+export function __wbindgen_closure_wrapper584(a, b, _ignored) {
+    const f = wasm.__wbg_function_table.get(166);
+    const d = wasm.__wbg_function_table.get(167);
     const cb = function(arg0) {
         this.cnt++;
         let a = this.a;
