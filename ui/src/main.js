@@ -129,9 +129,7 @@ var store = new Vuex.Store({
 					for (i; i < result.length; i++) {
 						var data = result[i];
 						console.log("result:", data);
-						var file_name = state.statements.value.find(function(element) {
-							return element.id == i;
-						}).name;
+						var file_name = 'sqltise_file_' + i
 						console.log("file_name:", file_name);
 
 						var blob = new Blob([data], {type: "application/sql"});
