@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+    "sqltise",
+    "sqltise_cli",
+    "sqltise_web",
+]
