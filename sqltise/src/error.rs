@@ -1,6 +1,7 @@
 #[derive(Debug, PartialEq)]
 pub enum SqltiseError {
-    NoHeaders,
-    InvalidHeaders,
-    CsvParseError,
+	NoHeaders,
+	InvalidHeaders,
+	CsvParseError,
+	ColumnOutOfBounds,
 }
