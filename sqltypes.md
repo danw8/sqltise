@@ -48,6 +48,12 @@
 * `nvarchar`, rusts String with `n` bytes or 2^31-1(1,073,741,823) bytes
 * `ntext` rust String with 2^31-1(1,073,741,823) bytes
 
+### Binary string
+
+* `binary[(n)]` crate hex .decode exactly `n`(is less than or equal to 8000) bytes of data
+* `varbinary[(n|max)]` crate hex .decode less than `n` or `8000` bytes of data or 2^31-1 bytes for a varbinary(max)
+* `image` crate hex .decode less than 2^31-1 bytes
+
 ### Unsupported Types
 
 \* Not sure if sqltise should support these if if it would ever even make sense to.

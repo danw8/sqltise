@@ -1,6 +1,6 @@
-mod ncharacter;
-mod ntext;
-mod nvarcharacter;
+pub mod ncharacter;
+pub mod ntext;
+pub mod nvarcharacter;
 
 pub use ncharacter::*;
 pub use ntext::*;

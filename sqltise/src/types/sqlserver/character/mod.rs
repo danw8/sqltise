@@ -1,7 +1,7 @@
-mod unicode;
-mod character;
-mod text;
-mod varcharacter;
+pub mod unicode;
+pub mod character;
+pub mod text;
+pub mod varcharacter;
 
 pub use character::*;
 pub use text::*;

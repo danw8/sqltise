@@ -1,5 +1,4 @@
-#![allow(unused)]
-use crate::types::{ SqlType, SqlTypeError, ErrorMessage };
+use crate::types::{ SqlType, ErrorMessage };
 
 pub struct Decimal {
 	precision: usize,
@@ -8,7 +7,7 @@ pub struct Decimal {
 }
 
 impl Decimal {
-	fn new(value: &str, precision: usize, scale: usize) -> Self {
+	pub fn new(value: &str, precision: usize, scale: usize) -> Self {
 		Decimal {
 			precision,
 			scale,
@@ -56,7 +55,7 @@ pub struct NullDecimal {
 }
 
 impl NullDecimal {
-	fn new(value: &str, precision: usize, scale: usize) -> Self {
+	pub fn new(value: &str, precision: usize, scale: usize) -> Self {
 		if value.to_lowercase().trim() == "null" {
 			return NullDecimal {value: None };
 		}
