@@ -1,4 +1,4 @@
-use crate::types::{ SqlType, SqlTypeError, ErrorMessage };
+use crate::types::{ErrorMessage, SqlType, SqlTypeError};
 
 pub struct Float {
 	value: f64,
@@ -10,9 +10,9 @@ impl Float {
 			Ok(value) => Ok(Float { value }),
 			Err(e) => {
 				let message = format!("parsing failed: {}", e);
-				Err(SqlTypeError { message})
+				Err(SqlTypeError { message })
 			}
-		}
+		};
 	}
 }
 
@@ -33,10 +33,10 @@ pub struct NullFloat {
 impl NullFloat {
 	pub fn new(value: &str) -> Result<Self, SqlTypeError> {
 		if value.to_lowercase().trim() == "null" {
-			return Ok( NullFloat { value: None} );
+			return Ok(NullFloat { value: None });
 		}
 		let float = Float::new(value)?;
-		Ok( NullFloat { value: Some(float) })
+		Ok(NullFloat { value: Some(float) })
 	}
 }
 

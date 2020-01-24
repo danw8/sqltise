@@ -6,7 +6,10 @@ pub struct SqlTypeError {
 
 pub struct ErrorMessage(String);
 
-pub trait SqlType where Self: std::marker::Sized {
+pub trait SqlType
+where
+	Self: std::marker::Sized,
+{
 	fn validate(&self) -> Result<(), ErrorMessage>;
 	fn to_sql(&self) -> String;
 }

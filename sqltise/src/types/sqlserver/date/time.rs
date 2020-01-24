@@ -1,6 +1,6 @@
-use chrono::naive::NaiveTime;
-use crate::types::{SqlType, SqlTypeError, ErrorMessage};
 use super::TIME_FORMATS;
+use crate::types::{ErrorMessage, SqlType, SqlTypeError};
+use chrono::naive::NaiveTime;
 
 pub struct Time {
 	value: NaiveTime,
@@ -13,13 +13,13 @@ impl Time {
 			let parsed = NaiveTime::parse_from_str(value, format);
 			if parsed.is_ok() {
 				let value = parsed.unwrap();
-				let time = Time {
-					value,
-				};
+				let time = Time { value };
 				return Ok(time);
 			}
 		}
-		return Err(SqlTypeError { message: "Couldn't parse as Time".to_string()})
+		return Err(SqlTypeError {
+			message: "Couldn't parse as Time".to_string(),
+		});
 	}
 }
 
@@ -35,35 +35,31 @@ impl SqlType for Time {
 }
 
 pub struct NullTime {
-	value: Option<Time>
+	value: Option<Time>,
 }
 
 impl NullTime {
 	pub fn new(value: &str) -> Result<Self, SqlTypeError> {
 		if value.to_lowercase().trim() == "null" {
-			return Ok( NullTime { value: None });
+			return Ok(NullTime { value: None });
 		}
 		let time = Time::new(value)?;
-		Ok( NullTime { value: Some(time) })
+		Ok(NullTime { value: Some(time) })
 	}
 }
 
 impl SqlType for NullTime {
 	fn validate(&self) -> Result<(), ErrorMessage> {
 		match &self.value {
-			Some(date) =>  {
-				date.validate()
-			},
-			None => {
-				Ok(())
-			}
+			Some(date) => date.validate(),
+			None => Ok(()),
 		}
 	}
 
 	fn to_sql(&self) -> String {
 		match &self.value {
 			Some(date) => date.to_sql(),
-			None => "NULL".to_string()
+			None => "NULL".to_string(),
 		}
 	}
 }

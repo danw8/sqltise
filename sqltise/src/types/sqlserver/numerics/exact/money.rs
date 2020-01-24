@@ -1,5 +1,5 @@
 #![allow(unused)]
-use crate::types::{ SqlType, SqlTypeError, ErrorMessage };
+use crate::types::{ErrorMessage, SqlType, SqlTypeError};
 
 pub struct Money {
 	value: i64,
@@ -17,11 +17,13 @@ impl Money {
 		let mut right = right.replace('.', "");
 
 		if right.len() < 4 {
-			for _ in 0..(4-right.len()) {
+			for _ in 0..(4 - right.len()) {
 				right.push('0');
 			}
 		} else if right.len() > 4 {
-			return Err(SqlTypeError { message: "Could not parse money value".to_string() });
+			return Err(SqlTypeError {
+				message: "Could not parse money value".to_string(),
+			});
 		}
 
 		left.push_str(&right);
@@ -29,9 +31,9 @@ impl Money {
 			Ok(value) => Ok(Money { value }),
 			Err(e) => {
 				let message = format!("parsing failed: {}", e);
-				Err(SqlTypeError { message})
+				Err(SqlTypeError { message })
 			}
-		}
+		};
 	}
 }
 
@@ -43,7 +45,7 @@ impl SqlType for Money {
 	fn to_sql(&self) -> String {
 		let value = self.value.to_string();
 		let split: usize = value.len() - 4;
-		
+
 		let (left, right) = value.split_at(split);
 		let mut value = left.to_string();
 		value.push_str(".");
@@ -59,10 +61,10 @@ pub struct NullMoney {
 impl NullMoney {
 	pub fn new(value: &str) -> Result<Self, SqlTypeError> {
 		if value.to_lowercase().trim() == "null" {
-			return Ok(NullMoney {value: None});
+			return Ok(NullMoney { value: None });
 		}
 		let money = Money::new(value)?;
-		Ok( NullMoney { value: Some(money)})
+		Ok(NullMoney { value: Some(money) })
 	}
 }
 
@@ -74,7 +76,7 @@ impl SqlType for NullMoney {
 	fn to_sql(&self) -> String {
 		match &self.value {
 			Some(money) => money.to_sql(),
-			None => "NULL".to_string()
+			None => "NULL".to_string(),
 		}
 	}
 }

@@ -1,5 +1,5 @@
 #![allow(unused)]
-use crate::types::{ SqlType, SqlTypeError, ErrorMessage };
+use crate::types::{ErrorMessage, SqlType, SqlTypeError};
 
 pub struct Real {
 	value: f32,
@@ -11,9 +11,9 @@ impl Real {
 			Ok(value) => Ok(Real { value }),
 			Err(e) => {
 				let message = format!("parsing failed: {}", e);
-				Err(SqlTypeError { message})
+				Err(SqlTypeError { message })
 			}
-		}
+		};
 	}
 }
 
@@ -34,10 +34,10 @@ pub struct NullReal {
 impl NullReal {
 	fn new(value: &str) -> Result<Self, SqlTypeError> {
 		if value.to_lowercase().trim() == "null" {
-			return Ok( NullReal { value: None } );
+			return Ok(NullReal { value: None });
 		}
 		let real = Real::new(value)?;
-		Ok( NullReal { value: Some(real) })
+		Ok(NullReal { value: Some(real) })
 	}
 }
 

@@ -1,5 +1,5 @@
 #![allow(unused)]
-use crate::types::{ SqlType, SqlTypeError, ErrorMessage };
+use crate::types::{ErrorMessage, SqlType, SqlTypeError};
 
 pub struct Integer {
 	value: i32,
@@ -11,9 +11,9 @@ impl Integer {
 			Ok(value) => Ok(Integer { value }),
 			Err(e) => {
 				let message = format!("parsing failed: {}", e);
-				Err(SqlTypeError { message})
+				Err(SqlTypeError { message })
 			}
-		}
+		};
 	}
 }
 
@@ -37,7 +37,9 @@ impl NullInteger {
 			return Ok(NullInteger { value: None });
 		}
 		let integer = Integer::new(value)?;
-		Ok( NullInteger { value: Some(integer)})
+		Ok(NullInteger {
+			value: Some(integer),
+		})
 	}
 }
 
@@ -54,7 +56,6 @@ impl SqlType for NullInteger {
 	}
 }
 
-
 pub struct UnsignedInteger {
 	value: u32,
 }
@@ -65,9 +66,9 @@ impl UnsignedInteger {
 			Ok(value) => Ok(UnsignedInteger { value }),
 			Err(e) => {
 				let message = format!("parsing failed: {}", e);
-				Err(SqlTypeError { message})
+				Err(SqlTypeError { message })
 			}
-		}
+		};
 	}
 }
 
@@ -88,10 +89,12 @@ pub struct NullUnsignedInteger {
 impl NullUnsignedInteger {
 	pub fn new(value: &str) -> Result<Self, SqlTypeError> {
 		if value.to_lowercase().trim() == "null" {
-			return Ok( NullUnsignedInteger {value: None});
+			return Ok(NullUnsignedInteger { value: None });
 		}
 		let unsigned_integer = UnsignedInteger::new(value)?;
-		Ok( NullUnsignedInteger { value: Some(unsigned_integer)})
+		Ok(NullUnsignedInteger {
+			value: Some(unsigned_integer),
+		})
 	}
 }
 

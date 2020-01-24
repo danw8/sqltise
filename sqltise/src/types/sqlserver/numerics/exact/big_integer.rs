@@ -1,5 +1,5 @@
 #![allow(unused)]
-use crate::types::{ SqlType, SqlTypeError, ErrorMessage };
+use crate::types::{ErrorMessage, SqlType, SqlTypeError};
 
 pub struct BigInteger {
 	value: i64,
@@ -11,9 +11,9 @@ impl BigInteger {
 			Ok(value) => Ok(BigInteger { value }),
 			Err(e) => {
 				let message = format!("parsing failed: {}", e);
-				Err(SqlTypeError { message})
+				Err(SqlTypeError { message })
 			}
-		}
+		};
 	}
 }
 
@@ -34,10 +34,12 @@ pub struct NullBigInteger {
 impl NullBigInteger {
 	fn new(value: &str) -> Result<Self, SqlTypeError> {
 		if value.to_lowercase().trim() == "null" {
-			return Ok( NullBigInteger { value: None } );
+			return Ok(NullBigInteger { value: None });
 		}
 		let big_integer = BigInteger::new(value)?;
-		Ok( NullBigInteger { value: Some(big_integer) })
+		Ok(NullBigInteger {
+			value: Some(big_integer),
+		})
 	}
 }
 
@@ -64,9 +66,9 @@ impl UnsignedBigInteger {
 			Ok(value) => Ok(UnsignedBigInteger { value }),
 			Err(e) => {
 				let message = format!("parsing failed: {}", e);
-				Err(SqlTypeError { message})
+				Err(SqlTypeError { message })
 			}
-		}
+		};
 	}
 }
 
@@ -87,10 +89,12 @@ pub struct NullUnsignedBigInteger {
 impl NullUnsignedBigInteger {
 	fn new(value: &str) -> Result<Self, SqlTypeError> {
 		if value.to_lowercase().trim() == "null" {
-			return Ok( NullUnsignedBigInteger { value: None } );
+			return Ok(NullUnsignedBigInteger { value: None });
 		}
 		let unsigned_big_integer = UnsignedBigInteger::new(value)?;
-		Ok( NullUnsignedBigInteger { value: Some(unsigned_big_integer) })
+		Ok(NullUnsignedBigInteger {
+			value: Some(unsigned_big_integer),
+		})
 	}
 }
 

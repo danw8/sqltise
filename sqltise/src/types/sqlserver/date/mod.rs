@@ -1,18 +1,25 @@
 pub mod date;
-pub mod datetime_offset;
 pub mod datetime;
 pub mod datetime2;
+pub mod datetime_offset;
 pub mod small_datetime;
 pub mod time;
 
 pub use date::*;
-pub use datetime_offset::*;
 pub use datetime::*;
 pub use datetime2::*;
+pub use datetime_offset::*;
 pub use small_datetime::*;
 pub use time::*;
 
-const TIME_FORMATS: [&str; 6] = ["%H:%M", "%H:%M:%S", "%H:%M:%S %p", "%H:%M:%S%.f", "%I:%M:%S %p", "%I:%M:%S%.f"];
+const TIME_FORMATS: [&str; 6] = [
+	"%H:%M",
+	"%H:%M:%S",
+	"%H:%M:%S %p",
+	"%H:%M:%S%.f",
+	"%I:%M:%S %p",
+	"%I:%M:%S%.f",
+];
 
 const DATE_FORMATS: [&str; 6] = ["%F", "%D", "%v", "%Y-%m-%d", "%m/%d/%Y", r#"%m\%d\%Y"#];
 
