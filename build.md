@@ -7,7 +7,7 @@
 
 ## front end
 ```
-cd sqlitise_web
+cd sqltise_web
 ```
 
 ```

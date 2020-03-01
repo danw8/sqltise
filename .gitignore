@@ -21,5 +21,6 @@ yarn-error.log*
 *.sw*
 
 /target
+/sqltise_web/pkg/*
 
 *.csv#
